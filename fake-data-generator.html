@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate random fake data for testing. Names, addresses, emails, phone numbers, and more. Perfect for development and prototyping.">
+    <meta name="keywords" content="fake data generator, random data generator, test data generator, mock data, sample data">
+    <title>Fake Data Generator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Fake Data Generator</h1><p>Generate realistic fake data for testing and development</p></div>
+
+        <div class="card">
+            <div class="card-title">Data Types</div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem;">
+                <label style="display:flex;align-items:center;gap:0.75rem;"><input type="checkbox" id="type-name" checked> Full Name</label>
+                <label style="display:flex;align-items:center;gap:0.75rem;"><input type="checkbox" id="type-email" checked> Email</label>
+                <label style="display:flex;align-items:center;gap:0.75rem;"><input type="checkbox" id="type-phone" checked> Phone Number</label>
+                <label style="display:flex;align-items:center;gap:0.75rem;"><input type="checkbox" id="type-address" checked> Address</label>
+                <label style="display:flex;align-items:center;gap:0.75rem;"><input type="checkbox" id="type-company"> Company</label>
+                <label style="display:flex;align-items:center;gap:0.75rem;"><input type="checkbox" id="type-username"> Username</label>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Number of Records</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <input type="number" id="count" value="10" min="1" max="100" style="width:100px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="generateData()">Generate Data</button>
+                <button class="btn btn-secondary" onclick="copyAllData()">Copy All</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Generated Data</div>
+            <textarea id="output-data" style="height:400px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        const firstNames = ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth', 'David', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Charles', 'Karen'];
+        const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'];
+        const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com'];
+        const streets = ['Main St', 'Oak Ave', 'Maple Dr', 'Cedar Ln', 'Pine Rd', 'Elm St', 'Washington Blvd', 'Lincoln Ave', 'Park Pl', 'Sunset Blvd'];
+        const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Seattle', 'Denver', 'Boston', 'Portland'];
+        const states = ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'TX', 'CA', 'TX', 'CA', 'TX', 'WA', 'CO', 'MA', 'OR'];
+        const companies = ['Tech Corp', 'Global Solutions', 'Digital Dynamics', 'Cloud Systems', 'Data Insights', 'Web Services', 'Smart Applications', 'Innovation Labs', 'Future Tech', 'Prime Solutions'];
+        const suffixes = ['Inc', 'LLC', 'Corp', 'Group', 'Technologies', 'Solutions', 'Systems', 'Services'];
+
+        function randomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function generateName() { return randomItem(firstNames) + ' ' + randomItem(lastNames); }
+        function generateEmail(name) { return name.toLowerCase().replace(' ', '.') + randomInt(1, 99) + '@' + randomItem(domains); }
+        function generatePhone() { return `(${randomInt(200, 999)}) ${randomInt(200, 999)}-${randomInt(1000, 9999)}`; }
+        function generateAddress() { return `${randomInt(100, 9999)} ${randomItem(streets)}, ${randomItem(cities)}, ${randomItem(states)} ${randomInt(10000, 99999)}`; }
+        function generateCompany() { return randomItem(companies) + ' ' + randomItem(suffixes); }
+        function generateUsername(name) { return name.toLowerCase().replace(' ', '') + randomInt(1, 999); }
+
+        function generateData() {
+            const count = Math.min(parseInt(document.getElementById('count').value) || 10, 100);
+            const types = { name: document.getElementById('type-name').checked, email: document.getElementById('type-email').checked, phone: document.getElementById('type-phone').checked, address: document.getElementById('type-address').checked, company: document.getElementById('type-company').checked, username: document.getElementById('type-username').checked };
+
+            let output = '';
+            for (let i = 0; i < count; i++) {
+                const name = generateName();
+                let line = [];
+                if (types.name) line.push(`Name: ${name}`);
+                if (types.email) line.push(`Email: ${generateEmail(name)}`);
+                if (types.phone) line.push(`Phone: ${generatePhone()}`);
+                if (types.address) line.push(`Address: ${generateAddress()}`);
+                if (types.company) line.push(`Company: ${generateCompany()}`);
+                if (types.username) line.push(`Username: ${generateUsername(name)}`);
+                output += line.join('\n') + '\n\n';
+            }
+
+            document.getElementById('output-data').value = output.trim();
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function copyAllData() { navigator.clipboard.writeText(document.getElementById('output-data').value).then(() => alert('All data copied!')); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Format and beautify SQL queries instantly. Supports MySQL, PostgreSQL, SQL Server, Oracle, and more. Free SQL formatter.">
+    <meta name="keywords" content="sql formatter, sql beautifier, format sql, sql query formatter, pretty print sql">
+    <title>SQL Formatter - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>SQL Formatter</h1><p>Format, beautify, and validate SQL queries</p></div>
+
+        <div class="card">
+            <div class="card-title">SQL Query</div>
+            <textarea id="sql-input" placeholder="SELECT id, name, email FROM users WHERE active = 1 ORDER BY created_at DESC LIMIT 10;" style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="formatSQL()">Format SQL</button>
+                <button class="btn btn-secondary" onclick="compactSQL()">Compact</button>
+                <button class="btn btn-secondary" onclick="clearSQL()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Formatted SQL</div>
+            <textarea id="sql-output" style="height:200px;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copySQL()">Copy</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Example Queries</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:0.75rem;margin-top:1rem;">
+                <button class="preset-btn" onclick="setSQL('SELECT u.name, u.email, COUNT(o.id) as orders FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE u.created_at > 2024-01-01 GROUP BY u.id HAVING COUNT(o.id) > 5 ORDER BY orders DESC LIMIT 20;')"><strong>Complex JOIN with GROUP BY</strong></button>
+                <button class="preset-btn" onclick="setSQL('INSERT INTO products (name, price, category) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?);')"><strong>Batch INSERT</strong></button>
+                <button class="preset-btn" onclick="setSQL('UPDATE users SET last_login = NOW(), login_count = login_count + 1 WHERE id = ?;')"><strong>UPDATE with NOW()</strong></button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        const keywords = ['SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'OUTER', 'FULL', 'ON', 'AS', 'ORDER', 'BY', 'GROUP', 'HAVING', 'LIMIT', 'OFFSET', 'INSERT', 'INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE', 'CREATE', 'TABLE', 'DROP', 'ALTER', 'INDEX', 'PRIMARY', 'KEY', 'FOREIGN', 'REFERENCES', 'NOT', 'NULL', 'DEFAULT', 'AUTO_INCREMENT', 'VARCHAR', 'INT', 'BIGINT', 'BOOLEAN', 'TIMESTAMP', 'DATETIME', 'TEXT', 'BLOB', 'DISTINCT', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'IN', 'LIKE', 'BETWEEN', 'IS', 'EXISTS', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'UNION', 'ALL', 'ASC', 'DESC'];
+
+        function formatSQL() {
+            let sql = document.getElementById('sql-input').value;
+            if (!sql.trim()) { alert('Please enter a SQL query first.'); return; }
+
+            sql = sql.replace(/\s+/g, ' ').trim();
+            keywords.forEach(kw => {
+                const regex = new RegExp(`\\b${kw}\\b`, 'gi');
+                sql = sql.replace(regex, kw);
+            });
+
+            sql = sql
+                .replace(/\s*\(\s*/g, ' ( ')
+                .replace(/\s*\)\s*/g, ' ) ')
+                .replace(/\s*,\s*/g, ', ')
+                .replace(/\s*=\s*/g, ' = ')
+                .replace(/\s*<\s*/g, ' < ')
+                .replace(/\s*>\s*/g, ' > ')
+                .replace(/\s*<=\s*/g, ' <= ')
+                .replace(/\s*>=\s*/g, ' >= ')
+                .replace(/\s*!=\s*/g, ' != ')
+                .replace(/\s*<>\s*/g, ' <> ')
+                .replace(/\s*\+\s*/g, ' + ')
+                .replace(/\s*-\s*/g, ' - ');
+
+            const upperKeywords = ['SELECT', 'FROM', 'WHERE', 'AND', 'OR', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'OUTER JOIN', 'FULL JOIN', 'ON', 'AS', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT', 'OFFSET', 'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM', 'CREATE TABLE', 'DROP TABLE', 'ALTER TABLE', 'PRIMARY KEY', 'FOREIGN KEY', 'NOT NULL', 'DEFAULT', 'AUTO_INCREMENT', 'DISTINCT', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'IN', 'LIKE', 'BETWEEN', 'IS NULL', 'IS NOT NULL', 'EXISTS', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'UNION', 'ALL'];
+            upperKeywords.forEach(kw => {
+                const regex = new RegExp(`\\b${kw}\\b`, 'gi');
+                sql = sql.replace(regex, kw);
+            });
+
+            let formatted = '';
+            let indent = 0;
+            const lines = sql.split(/\s+/);
+            let inParen = false;
+
+            lines.forEach((word, i) => {
+                if (word === '(') inParen = true;
+                if (word === ')') { inParen = false; indent = Math.max(0, indent - 1); }
+
+                const prefix = inParen ? '  '.repeat(indent + 1) : '  '.repeat(indent);
+                formatted += prefix + word + ' ';
+
+                if (['WHERE', 'AND', 'OR', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT', 'OFFSET', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'FROM'].includes(word.toUpperCase().replace(/,/g, ''))) {
+                    formatted += '\n';
+                    if (!inParen) indent++;
+                }
+            });
+
+            formatted = formatted.replace(/\s+/g, ' ').replace(/\s*\n\s*/g, '\n').trim();
+            document.getElementById('sql-output').value = formatted;
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function compactSQL() {
+            let sql = document.getElementById('sql-input').value;
+            if (!sql.trim()) { alert('Please enter a SQL query first.'); return; }
+            sql = sql.replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').replace(/\s*;\s*/g, ';').trim();
+            document.getElementById('sql-output').value = sql;
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function setSQL(sql) { document.getElementById('sql-input').value = sql; formatSQL(); }
+        function clearSQL() { document.getElementById('sql-input').value = ''; document.getElementById('sql-output').value = ''; document.getElementById('result-card').style.display = 'none'; }
+        function copySQL() { navigator.clipboard.writeText(document.getElementById('sql-output').value).then(() => alert('SQL copied!')); }
+    </script>
+</body>
+</html>

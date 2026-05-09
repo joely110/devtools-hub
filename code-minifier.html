@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Minify HTML, CSS, and JavaScript code online. Reduce file size for faster page loads. Free and instant.">
+    <meta name="keywords" content="html minifier, css minifier, javascript minifier, minify code, compress html">
+    <title>HTML/CSS/JS Minifier - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Code Minifier</h1><p>Minify HTML, CSS, and JavaScript to reduce file size</p></div>
+
+        <div class="card">
+            <div class="card-title">Select Code Type</div>
+            <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;">
+                <button class="btn btn-primary" id="btn-html" onclick="setMode('html')">HTML</button>
+                <button class="btn btn-secondary" id="btn-css" onclick="setMode('css')">CSS</button>
+                <button class="btn btn-secondary" id="btn-js" onclick="setMode('js')">JavaScript</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Input Code</div>
+            <textarea id="input-code" placeholder="Paste your code here..." style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="minifyCode()">Minify</button>
+                <button class="btn btn-secondary" onclick="formatCode()">Beautify</button>
+                <button class="btn btn-secondary" onclick="clearCode()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Output <span id="size-info" style="font-weight:normal;font-size:0.8rem;"></span></div>
+            <textarea id="output-code" style="height:200px;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyOutput()">Copy</button>
+                <span id="copy-feedback" style="color:var(--success);font-size:0.9rem;display:none;margin-left:1rem;">Copied!</span>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        let currentMode = 'html';
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-html').className = 'btn ' + (mode === 'html' ? 'btn-primary' : 'btn-secondary');
+            document.getElementById('btn-css').className = 'btn ' + (mode === 'css' ? 'btn-primary' : 'btn-secondary');
+            document.getElementById('btn-js').className = 'btn ' + (mode === 'js' ? 'btn-primary' : 'btn-secondary');
+        }
+
+        function minifyCode() {
+            const input = document.getElementById('input-code').value;
+            const output = document.getElementById('output-code');
+            const resultCard = document.getElementById('result-card');
+            const sizeInfo = document.getElementById('size-info');
+
+            if (!input.trim()) { alert('Please enter some code first.'); return; }
+
+            let result = input;
+
+            if (currentMode === 'html') {
+                result = input
+                    .replace(/<!--[\s\S]*?-->/g, '')
+                    .replace(/\s+/g, ' ')
+                    .replace(/>\s+</g, '><')
+                    .replace(/\s+\/\s*>/g, '/>')
+                    .trim();
+            } else if (currentMode === 'css') {
+                result = input
+                    .replace(/\/\*[\s\S]*?\*\//g, '')
+                    .replace(/\s+/g, ' ')
+                    .replace(/\s*([{}:;,])\s*/g, '$1')
+                    .replace(/;}/g, '}')
+                    .trim();
+            } else if (currentMode === 'js') {
+                result = input
+                    .replace(/\/\*[\s\S]*?\*\//g, '')
+                    .replace(/\/\/.*/g, '')
+                    .replace(/\s+/g, ' ')
+                    .replace(/\s*([{}()[\];,+<>&|=])\s*/g, '$1')
+                    .trim();
+            }
+
+            output.value = result;
+            resultCard.style.display = 'block';
+            const origSize = new Blob([input]).size;
+            const newSize = new Blob([result]).size;
+            const reduction = ((origSize - newSize) / origSize * 100).toFixed(1);
+            sizeInfo.textContent = `Original: ${formatBytes(origSize)} → Minified: ${formatBytes(newSize)} (${reduction}% smaller)`;
+        }
+
+        function formatCode() {
+            const input = document.getElementById('input-code').value;
+            const output = document.getElementById('output-code');
+            const resultCard = document.getElementById('result-card');
+
+            if (!input.trim()) { alert('Please enter some code first.'); return; }
+
+            let result = input;
+            if (currentMode === 'html') {
+                result = formatHTML(input);
+            } else if (currentMode === 'css') {
+                result = formatCSS(input);
+            } else if (currentMode === 'js') {
+                result = formatJS(input);
+            }
+
+            output.value = result;
+            resultCard.style.display = 'block';
+            document.getElementById('size-info').textContent = '';
+        }
+
+        function formatHTML(html) {
+            let formatted = '';
+            let indent = 0;
+            html.replace(/>\s*</g, '><').split(/(<[^>]+>)/).forEach(node => {
+                if (!node.trim()) return;
+                if (node.match(/<\/\w/)) indent--;
+                formatted += '  '.repeat(Math.max(0, indent)) + node.trim() + '\n';
+                if (node.match(/<\w[^>]*[^\/]>$/)) indent++;
+            });
+            return formatted.trim();
+        }
+
+        function formatCSS(css) {
+            return css
+                .replace(/\s*{\s*/g, ' {\n  ')
+                .replace(/\s*;\s*/g, ';\n  ')
+                .replace(/\s*}\s*/g, '\n}\n')
+                .replace(/  \n/g, '\n')
+                .trim();
+        }
+
+        function formatJS(js) {
+            return js
+                .replace(/\{/g, ' {\n  ')
+                .replace(/\}/g, '\n}\n')
+                .replace(/;/g, ';\n')
+                .replace(/  \n/g, '\n')
+                .trim();
+        }
+
+        function clearCode() { document.getElementById('input-code').value = ''; document.getElementById('output-code').value = ''; document.getElementById('result-card').style.display = 'none'; }
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('output-code').value).then(() => { document.getElementById('copy-feedback').style.display = 'inline'; setTimeout(() => document.getElementById('copy-feedback').style.display = 'none', 2000); }); }
+        function formatBytes(n) { if (n < 1024) return n + ' B'; if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB'; return (n / (1024 * 1024)).toFixed(1) + ' MB'; }
+    </script>
+</body>
+</html>

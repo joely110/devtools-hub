@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate credit card numbers for testing. Valid test card numbers for Stripe, PayPal, and more. For testing purposes only.">
+    <meta name="keywords" content="credit card generator, test card numbers, fake credit card, testing card numbers">
+    <title>Credit Card Generator (Test Numbers) - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Credit Card Generator</h1><p>Generate valid test card numbers for development and testing</p></div>
+
+        <div class="card" style="background:var(--warning-bg);border-color:var(--warning-border);">
+            <p style="font-size:0.9rem;color:var(--text);"><strong>⚠ For Testing Only</strong><br>These are fictional test card numbers. Never use them for real transactions. They only work in Stripe, PayPal, etc. test modes.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Select Card Type</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;margin-top:1rem;">
+                <button class="btn btn-primary" id="btn-visa" onclick="setCardType('visa')">Visa</button>
+                <button class="btn btn-secondary" id="btn-mastercard" onclick="setCardType('mastercard')">Mastercard</button>
+                <button class="btn btn-secondary" id="btn-amex" onclick="setCardType('amex')">American Express</button>
+                <button class="btn btn-secondary" id="btn-discover" onclick="setCardType('discover')">Discover</button>
+            </div>
+            <div style="margin-top:1rem;">
+                <label style="display:flex;align-items:center;gap:0.5rem;">
+                    <input type="checkbox" id="include-name" checked>
+                    Include fake cardholder name
+                </label>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generateCards()">Generate New Cards</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Generated Test Cards</div>
+            <div id="cards-list"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        let currentType = 'visa';
+        const prefixes = { visa: ['4532', '4916', '4539'], mastercard: ['5412', '5500', '5555'], amex: ['3788', '3714', '3400'], discover: ['6011', '6500'] };
+        const names = ['John Smith', 'Jane Doe', 'Alex Johnson', 'Sarah Williams', 'Michael Brown', 'Emily Davis', 'David Wilson', 'Lisa Anderson'];
+
+        function setCardType(type) {
+            currentType = type;
+            ['visa', 'mastercard', 'amex', 'discover'].forEach(t => {
+                document.getElementById('btn-' + t).className = 'btn ' + (t === type ? 'btn-primary' : 'btn-secondary');
+            });
+        }
+
+        function generateCards() {
+            const resultCard = document.getElementById('result-card');
+            const cardsList = document.getElementById('cards-list');
+            const includeName = document.getElementById('include-name').checked;
+            const prefix = prefixes[currentType][Math.floor(Math.random() * prefixes[currentType].length)];
+            const cards = [];
+
+            for (let i = 0; i < 5; i++) {
+                const fakePrefix = prefix + String(Math.floor(Math.random() * 1000000000)).padStart(9, '0');
+                const cardNum = fakePrefix + generateCheckDigit(fakePrefix);
+                const expMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+                const expYear = 2025 + Math.floor(Math.random() * 6);
+                const cvv = String(Math.floor(Math.random() * 900) + 100);
+                const name = includeName ? names[Math.floor(Math.random() * names.length)] : '';
+                const last4 = cardNum.slice(-4);
+
+                cards.push({ num: cardNum, exp: `${expMonth}/${expYear}`, cvv, name, last4 });
+            }
+
+            cardsList.innerHTML = cards.map((c, i) => `
+                <div style="padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+                        <strong style="text-transform:capitalize;">${currentType} •••• ${c.last4}</strong>
+                        <button class="btn btn-secondary" onclick="copyCard(${i})" style="padding:0.4rem 0.75rem;font-size:0.85rem;">Copy</button>
+                    </div>
+                    <div style="font-family:'SF Mono',Monaco,monospace;font-size:1.1rem;margin-bottom:0.5rem;">${formatCardNumber(c.num)}</div>
+                    <div style="display:flex;gap:2rem;font-size:0.85rem;color:var(--text-muted);">
+                        <span>Exp: ${c.exp}</span>
+                        <span>CVV: ${c.cvv}</span>
+                        ${c.name ? `<span>Name: ${c.name}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            window.generatedCards = cards;
+            resultCard.style.display = 'block';
+        }
+
+        function generateCheckDigit(num) {
+            let sum = 0;
+            for (let i = 0; i < num.length; i++) {
+                let digit = parseInt(num[i]);
+                if ((num.length - i) % 2 === 0) {
+                    digit *= 2;
+                    if (digit > 9) digit -= 9;
+                }
+                sum += digit;
+            }
+            return String((10 - (sum % 10)) % 10);
+        }
+
+        function formatCardNumber(num) {
+            return num.match(/.{1,4}/g).join(' ');
+        }
+
+        function copyCard(index) {
+            const c = window.generatedCards[index];
+            const text = `${currentType.toUpperCase()}\n${c.num}\n${c.exp}\n${c.cvv}${c.name ? '\n' + c.name : ''}`;
+            navigator.clipboard.writeText(text).then(() => alert('Card details copied!'));
+        }
+    </script>
+</body>
+</html>

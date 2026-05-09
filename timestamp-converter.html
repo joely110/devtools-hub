@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert between Unix timestamps and human-readable dates. See current Unix time, convert timestamps to dates and vice versa. Free and instant.">
+    <meta name="keywords" content="unix timestamp, unix time, timestamp converter, epoch converter, unix timestamp now">
+    <title>Unix Timestamp Converter - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Unix Timestamp Converter</h1><p>Convert between Unix timestamps and human-readable dates</p></div>
+
+        <div class="card">
+            <div class="card-title">Current Time</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-top:1rem;text-align:center;">
+                <div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">Unix Timestamp (seconds)</div>
+                    <div class="timestamp-display" id="timestamp-sec" style="font-family:'SF Mono',Monaco,monospace;font-size:1.5rem;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;" onclick="copyTimestamp('sec')"></div>
+                </div>
+                <div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;">Unix Timestamp (milliseconds)</div>
+                    <div class="timestamp-display" id="timestamp-ms" style="font-family:'SF Mono',Monaco,monospace;font-size:1.5rem;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;" onclick="copyTimestamp('ms')"></div>
+                </div>
+            </div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-top:1rem;text-align:center;">Click a timestamp to copy</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Convert Timestamp to Date</div>
+            <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:1rem;">
+                <input type="number" id="timestamp-input" placeholder="Enter timestamp (e.g., 1704067200)" style="flex:1;min-width:200px;">
+                <select id="timestamp-unit" style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                    <option value="sec">Seconds</option>
+                    <option value="ms">Milliseconds</option>
+                </select>
+                <button class="btn btn-primary" onclick="convertToDate()">Convert</button>
+            </div>
+            <div id="converted-date" style="margin-top:1rem;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:1.1rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Convert Date to Timestamp</div>
+            <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:1rem;">
+                <input type="datetime-local" id="date-input" style="flex:1;min-width:200px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="convertToTimestamp()">Convert</button>
+            </div>
+            <div id="converted-timestamp" style="margin-top:1rem;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-family:'SF Mono',Monaco,monospace;font-size:1.1rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Common Timestamps</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;margin-top:1rem;">
+                <button class="preset-btn" onclick="setTimestamp(0)"><strong>Unix Epoch (Jan 1, 1970)</strong><code>0</code></button>
+                <button class="preset-btn" onclick="setTimestamp(1000000000)"><strong>Sep 9, 2001</strong><code>1000000000</code></button>
+                <button class="preset-btn" onclick="setTimestamp(1609459200)"><strong>Jan 1, 2021</strong><code>1609459200</code></button>
+                <button class="preset-btn" onclick="setTimestamp(1735689600)"><strong>Jan 1, 2025</strong><code>1735689600</code></button>
+                <button class="preset-btn" onclick="setTimestamp(1900000000)"><strong>Jul 14, 2033</strong><code>1900000000</code></button>
+                <button class="preset-btn" onclick="setTimestamp(2000000000)"><strong>May 18, 2033</strong><code>2000000000</code></button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function updateCurrentTime() {
+            const now = Date.now();
+            const sec = Math.floor(now / 1000);
+            const ms = now;
+            document.getElementById('timestamp-sec').textContent = sec;
+            document.getElementById('timestamp-ms').textContent = ms;
+        }
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+
+        function copyTimestamp(type) {
+            const val = type === 'sec' ? document.getElementById('timestamp-sec').textContent : document.getElementById('timestamp-ms').textContent;
+            navigator.clipboard.writeText(val).then(() => alert('Copied: ' + val));
+        }
+
+        function convertToDate() {
+            const input = document.getElementById('timestamp-input').value;
+            const unit = document.getElementById('timestamp-unit').value;
+            const result = document.getElementById('converted-date');
+            if (!input) { result.textContent = 'Please enter a timestamp'; result.style.color = 'var(--error)'; return; }
+            const ts = unit === 'ms' ? parseInt(input) : parseInt(input) * 1000;
+            const date = new Date(ts);
+            if (isNaN(date.getTime())) { result.textContent = 'Invalid timestamp'; result.style.color = 'var(--error)'; return; }
+            result.innerHTML = `<strong>${date.toUTCString()}</strong><br><strong>Local:</strong> ${date.toLocaleString()}<br><strong>Relative:</strong> ${getRelativeTime(date)}`;
+            result.style.color = 'var(--text)';
+        }
+
+        function convertToTimestamp() {
+            const input = document.getElementById('date-input').value;
+            const result = document.getElementById('converted-timestamp');
+            if (!input) { result.textContent = 'Please select a date'; return; }
+            const date = new Date(input);
+            if (isNaN(date.getTime())) { result.textContent = 'Invalid date'; return; }
+            result.innerHTML = `<strong>Seconds:</strong> ${Math.floor(date.getTime() / 1000)}<br><strong>Milliseconds:</strong> ${date.getTime()}`;
+        }
+
+        function setTimestamp(ts) {
+            document.getElementById('timestamp-input').value = ts;
+            document.getElementById('timestamp-unit').value = 'sec';
+            convertToDate();
+        }
+
+        function getRelativeTime(date) {
+            const now = new Date();
+            const diff = date - now;
+            const absDiff = Math.abs(diff);
+            const seconds = Math.floor(absDiff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const inFuture = diff > 0;
+            if (days > 365) return `${inFuture ? 'in ' : ''}${Math.floor(days / 365)} years ${inFuture ? '' : 'ago'}`;
+            if (days > 30) return `${inFuture ? 'in ' : ''}${Math.floor(days / 30)} months ${inFuture ? '' : 'ago'}`;
+            if (days > 0) return `${inFuture ? 'in ' : ''}${days} days ${inFuture ? '' : 'ago'}`;
+            if (hours > 0) return `${inFuture ? 'in ' : ''}${hours} hours ${inFuture ? '' : 'ago'}`;
+            if (minutes > 0) return `${inFuture ? 'in ' : ''}${minutes} minutes ${inFuture ? '' : 'ago'}`;
+            return `${inFuture ? 'in ' : ''}${seconds} seconds ${inFuture ? '' : 'ago'}`;
+        }
+    </script>
+</body>
+</html>
