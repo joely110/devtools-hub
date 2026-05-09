@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate cron schedule expressions online. Human-readable explanation of cron jobs. Free and instant.">
+    <meta name="keywords" content="cron generator, cron expression, crontab, cron schedule, online cron generator">
+    <title>Crontab Generator - Cron Expression Builder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tool-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .cron-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+        .cron-field label {
+            min-width: 120px;
+            font-weight: 600;
+        }
+        .cron-field input, .cron-field select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .cron-field input[type="number"] {
+            width: 80px;
+        }
+        .cron-display {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 1.5rem;
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 1.5rem 0;
+            border: 1px solid #e2e8f0;
+        }
+        .cron-result {
+            padding: 1rem;
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 6px;
+            color: #22543d;
+        }
+        .nav-links { margin-bottom: 1.5rem; }
+        .nav-links a { color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Crontab Generator</h1>
+        <p>Build Cron Schedule Expressions Easily</p>
+    </header>
+
+    <main>
+        <div class="nav-links">
+            <a href="index.html">&larr; Back to DevTools Hub</a>
+        </div>
+
+        <div class="tool-container">
+            <div class="cron-field">
+                <label>Minute:</label>
+                <input type="text" id="minute" value="*" placeholder="0-59 or *">
+                <select id="minute-preset" onchange="setPreset('minute', this.value)">
+                    <option value="*">Every minute</option>
+                    <option value="0">At minute 0</option>
+                    <option value="15">At minute 15</option>
+                    <option value="30">At minute 30</option>
+                    <option value="45">At minute 45</option>
+                    <option value="*/5">Every 5 minutes</option>
+                    <option value="*/10">Every 10 minutes</option>
+                    <option value="*/15">Every 15 minutes</option>
+                    <option value="*/30">Every 30 minutes</option>
+                </select>
+            </div>
+            <div class="cron-field">
+                <label>Hour:</label>
+                <input type="text" id="hour" value="*" placeholder="0-23 or *">
+                <select id="hour-preset" onchange="setPreset('hour', this.value)">
+                    <option value="*">Every hour</option>
+                    <option value="0">At midnight (0)</option>
+                    <option value="6">At 6 AM</option>
+                    <option value="9">At 9 AM</option>
+                    <option value="12">At noon (12)</option>
+                    <option value="18">At 6 PM</option>
+                    <option value="*/2">Every 2 hours</option>
+                    <option value="*/6">Every 6 hours</option>
+                    <option value="*/12">Every 12 hours</option>
+                </select>
+            </div>
+            <div class="cron-field">
+                <label>Day of Month:</label>
+                <input type="text" id="day" value="*" placeholder="1-31 or *">
+                <select id="day-preset" onchange="setPreset('day', this.value)">
+                    <option value="*">Every day</option>
+                    <option value="1">1st of month</option>
+                    <option value="15">15th of month</option>
+                    <option value="1,15">1st and 15th</option>
+                    <option value="1-7">First week</option>
+                </select>
+            </div>
+            <div class="cron-field">
+                <label>Month:</label>
+                <input type="text" id="month" value="*" placeholder="1-12 or *">
+                <select id="month-preset" onchange="setPreset('month', this.value)">
+                    <option value="*">Every month</option>
+                    <option value="1">January</option>
+                    <option value="6">June</option>
+                    <option value="12">December</option>
+                    <option value="*/3">Every quarter</option>
+                    <option value="1,4,7,10">Quarterly</option>
+                </select>
+            </div>
+            <div class="cron-field">
+                <label>Day of Week:</label>
+                <input type="text" id="weekday" value="*" placeholder="0-6 or *">
+                <select id="weekday-preset" onchange="setPreset('weekday', this.value)">
+                    <option value="*">Every weekday</option>
+                    <option value="1-5">Mon-Fri (weekdays)</option>
+                    <option value="0,6">Sat-Sun (weekends)</option>
+                    <option value="1">Monday</option>
+                    <option value="5">Friday</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="tool-container">
+            <div class="cron-display" id="cron-expression">* * * * *</div>
+            <div style="text-align: center;">
+                <button class="btn btn-primary" onclick="updateCron()">Update</button>
+                <button class="btn btn-secondary" onclick="copyCron()">Copy</button>
+            </div>
+            <div class="cron-result" id="cron-description" style="margin-top: 1rem;">
+                Runs every minute
+            </div>
+        </div>
+
+        <div class="tool-container">
+            <h3>Common Schedules</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div class="schedule-preset" onclick="setCron('* * * * *')" style="cursor:pointer; padding:1rem; background:#f7fafc; border-radius:6px;">
+                    <strong>Every minute</strong><br><code>* * * * *</code>
+                </div>
+                <div class="schedule-preset" onclick="setCron('*/5 * * * *')" style="cursor:pointer; padding:1rem; background:#f7fafc; border-radius:6px;">
+                    <strong>Every 5 minutes</strong><br><code>*/5 * * * *</code>
+                </div>
+                <div class="schedule-preset" onclick="setCron('0 * * * *')" style="cursor:pointer; padding:1rem; background:#f7fafc; border-radius:6px;">
+                    <strong>Every hour</strong><br><code>0 * * * *</code>
+                </div>
+                <div class="schedule-preset" onclick="setCron('0 0 * * *')" style="cursor:pointer; padding:1rem; background:#f7fafc; border-radius:6px;">
+                    <strong>Daily at midnight</strong><br><code>0 0 * * *</code>
+                </div>
+                <div class="schedule-preset" onclick="setCron('0 9 * * 1-5')" style="cursor:pointer; padding:1rem; background:#f7fafc; border-radius:6px;">
+                    <strong>Weekdays at 9 AM</strong><br><code>0 9 * * 1-5</code>
+                </div>
+                <div class="schedule-preset" onclick="setCron('0 0 1 * *')" style="cursor:pointer; padding:1rem; background:#f7fafc; border-radius:6px;">
+                    <strong>Monthly (1st day)</strong><br><code>0 0 1 * *</code>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DevTools Hub. All tools are free to use.</p>
+    </footer>
+
+    <script>
+        function setPreset(field, value) {
+            document.getElementById(field).value = value;
+            updateCron();
+        }
+
+        function setCron(expression) {
+            const parts = expression.split(' ');
+            if (parts.length === 5) {
+                document.getElementById('minute').value = parts[0];
+                document.getElementById('hour').value = parts[1];
+                document.getElementById('day').value = parts[2];
+                document.getElementById('month').value = parts[3];
+                document.getElementById('weekday').value = parts[4];
+                updateCron();
+            }
+        }
+
+        function updateCron() {
+            const minute = document.getElementById('minute').value || '*';
+            const hour = document.getElementById('hour').value || '*';
+            const day = document.getElementById('day').value || '*';
+            const month = document.getElementById('month').value || '*';
+            const weekday = document.getElementById('weekday').value || '*';
+
+            const expression = `${minute} ${hour} ${day} ${month} ${weekday}`;
+            document.getElementById('cron-expression').textContent = expression;
+            document.getElementById('cron-description').textContent = describeCron(expression);
+        }
+
+        function describeCron(expr) {
+            const [min, hour, day, mon, wday] = expr.split(' ');
+            const descriptions = [];
+
+            // Time
+            if (min === '*' && hour === '*') {
+                descriptions.push('Every minute');
+            } else if (min === '*/5') {
+                descriptions.push('Every 5 minutes');
+            } else if (min === '*/10') {
+                descriptions.push('Every 10 minutes');
+            } else if (min === '*/15') {
+                descriptions.push('Every 15 minutes');
+            } else if (min === '*/30') {
+                descriptions.push('Every 30 minutes');
+            } else if (hour === '*' && min !== '*') {
+                descriptions.push(`At minute ${min} of every hour`);
+            } else if (min === '0' && hour === '*') {
+                descriptions.push('Every hour');
+            } else if (min !== '*' && hour !== '*') {
+                descriptions.push(`At ${hour.padStart(2, '0')}:${min.padStart(2, '0')}`);
+            }
+
+            // Day
+            if (day === '*' && mon === '*' && wday === '*') {
+                descriptions.push('every day');
+            } else if (wday === '1-5') {
+                descriptions.push('Monday through Friday');
+            } else if (wday === '0,6') {
+                descriptions.push('on weekends (Sat-Sun)');
+            } else if (wday === '1') {
+                descriptions.push('on Monday');
+            } else if (wday === '5') {
+                descriptions.push('on Friday');
+            } else if (day === '1' && mon === '*') {
+                descriptions.push('on the 1st of every month');
+            } else if (day === '1,15') {
+                descriptions.push('on the 1st and 15th of every month');
+            }
+
+            // Month
+            if (mon !== '*') {
+                const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                if (mon >= 1 && mon <= 12) {
+                    descriptions.push(`in ${monthNames[parseInt(mon)]}`);
+                }
+            }
+
+            return descriptions.join(' ');
+        }
+
+        function copyCron() {
+            const expr = document.getElementById('cron-expression').textContent;
+            navigator.clipboard.writeText(expr).then(() => alert('Cron expression copied!'));
+        }
+
+        // Initialize
+        updateCron();
+    </script>
+</body>
+</html>

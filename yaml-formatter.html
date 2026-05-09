@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Format, minify, and validate YAML data online. Convert YAML to JSON and vice versa. Free and instant.">
+    <meta name="keywords" content="yaml formatter, yaml validator, yaml to json, yaml parser, online yaml tool">
+    <title>YAML Formatter & Validator - Free Online Tool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tool-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #4a90d9;
+        }
+        .result-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result-box.valid {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+        }
+        .result-box.invalid {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #742a2a;
+        }
+        .nav-links { margin-bottom: 1.5rem; }
+        .nav-links a { color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>YAML Formatter</h1>
+        <p>Format, Validate & Convert YAML Data</p>
+    </header>
+
+    <main>
+        <div class="nav-links">
+            <a href="index.html">&larr; Back to DevTools Hub</a>
+        </div>
+
+        <div class="tool-container">
+            <label><strong>Enter YAML:</strong></label>
+            <textarea id="yaml-input" placeholder="Paste your YAML here..."></textarea>
+            <div style="margin: 1rem 0;">
+                <button class="btn btn-primary" onclick="formatYAML()">Format</button>
+                <button class="btn btn-secondary" onclick="minifyYAML()">Minify</button>
+                <button class="btn btn-secondary" onclick="validateYAML()">Validate</button>
+                <button class="btn btn-secondary" onclick="yamlToJSON()">YAML → JSON</button>
+                <button class="btn btn-secondary" onclick="clearYAML()">Clear</button>
+            </div>
+        </div>
+
+        <div class="tool-container">
+            <label><strong>Result:</strong></label>
+            <div id="result" class="result-box"></div>
+            <div style="margin-top: 1rem;">
+                <button class="btn btn-primary" id="copy-btn" style="display:none;" onclick="copyResult()">Copy Result</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DevTools Hub. All tools are free to use.</p>
+    </footer>
+
+    <script>
+        // Simple YAML parser for basic structures
+        function parseYAML(yaml) {
+            const lines = yaml.split('\n');
+            const result = {};
+            const stack = [{ obj: result, indent: -1 }];
+            let currentArray = null;
+
+            for (let line of lines) {
+                if (line.trim() === '' || line.trim().startsWith('#')) continue;
+
+                const indent = line.search(/\S/);
+                const trimmed = line.trim();
+
+                // Pop stack to find parent
+                while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
+                    stack.pop();
+                }
+
+                const parent = stack[stack.length - 1].obj;
+
+                // Array item
+                if (trimmed.startsWith('- ')) {
+                    const value = trimmed.substring(2).trim();
+                    if (Array.isArray(parent)) {
+                        if (value.includes(':')) {
+                            const item = {};
+                            const [key, ...rest] = value.split(':');
+                            item[key.trim()] = rest.join(':').trim();
+                            parent.push(item);
+                            stack.push({ obj: item, indent: indent + 2 });
+                        } else {
+                            parent.push(value.replace(/['"]/g, ''));
+                        }
+                    }
+                }
+                // Key-value pair
+                else if (trimmed.includes(':')) {
+                    const [key, ...rest] = trimmed.split(':');
+                    const value = rest.join(':').trim();
+                    const keyName = key.trim();
+
+                    if (value === '' || value === '|' || value === '>') {
+                        parent[keyName] = {};
+                        stack.push({ obj: parent[keyName], indent: indent });
+                    } else if (value.startsWith('[') && value.endsWith(']')) {
+                        parent[keyName] = value.slice(1, -1).split(',').map(s => s.trim().replace(/['"]/g, ''));
+                    } else {
+                        parent[keyName] = value.replace(/['"]/g, '');
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        function toYAML(obj, indent = 0) {
+            let result = '';
+            const spaces = '  '.repeat(indent);
+
+            if (Array.isArray(obj)) {
+                for (const item of obj) {
+                    if (typeof item === 'object') {
+                        result += `${spaces}- ${toYAML(item, indent + 1).trim()}\n`;
+                    } else {
+                        result += `${spaces}- ${item}\n`;
+                    }
+                }
+            } else if (typeof obj === 'object' && obj !== null) {
+                for (const [key, value] of Object.entries(obj)) {
+                    if (typeof value === 'object' && value !== null) {
+                        if (Array.isArray(value)) {
+                            result += `${spaces}${key}:\n${toYAML(value, indent + 1)}`;
+                        } else {
+                            result += `${spaces}${key}:\n${toYAML(value, indent + 1)}`;
+                        }
+                    } else {
+                        result += `${spaces}${key}: ${value}\n`;
+                    }
+                }
+            } else {
+                result += `${obj}\n`;
+            }
+
+            return result;
+        }
+
+        function formatYAML() {
+            const input = document.getElementById('yaml-input').value;
+            const result = document.getElementById('result');
+            const copyBtn = document.getElementById('copy-btn');
+
+            if (!input.trim()) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Please enter some YAML first.';
+                return;
+            }
+
+            try {
+                const parsed = parseYAML(input);
+                const formatted = toYAML(parsed).trim();
+                result.className = 'result-box valid';
+                result.textContent = formatted;
+                copyBtn.style.display = 'inline-block';
+            } catch (e) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Invalid YAML: ' + e.message;
+                copyBtn.style.display = 'none';
+            }
+        }
+
+        function minifyYAML() {
+            const input = document.getElementById('yaml-input').value;
+            const result = document.getElementById('result');
+            const copyBtn = document.getElementById('copy-btn');
+
+            if (!input.trim()) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Please enter some YAML first.';
+                return;
+            }
+
+            try {
+                const parsed = parseYAML(input);
+                const minified = JSON.stringify(parsed);
+                result.className = 'result-box';
+                result.textContent = minified;
+                copyBtn.style.display = 'inline-block';
+            } catch (e) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Invalid YAML: ' + e.message;
+                copyBtn.style.display = 'none';
+            }
+        }
+
+        function validateYAML() {
+            const input = document.getElementById('yaml-input').value;
+            const result = document.getElementById('result');
+            const copyBtn = document.getElementById('copy-btn');
+
+            if (!input.trim()) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Please enter some YAML first.';
+                return;
+            }
+
+            try {
+                parseYAML(input);
+                result.className = 'result-box valid';
+                result.textContent = 'Valid YAML ✓';
+                copyBtn.style.display = 'none';
+            } catch (e) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Invalid YAML: ' + e.message;
+                copyBtn.style.display = 'none';
+            }
+        }
+
+        function yamlToJSON() {
+            const input = document.getElementById('yaml-input').value;
+            const result = document.getElementById('result');
+            const copyBtn = document.getElementById('copy-btn');
+
+            if (!input.trim()) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Please enter some YAML first.';
+                return;
+            }
+
+            try {
+                const parsed = parseYAML(input);
+                const json = JSON.stringify(parsed, null, 2);
+                result.className = 'result-box';
+                result.textContent = json;
+                copyBtn.style.display = 'inline-block';
+            } catch (e) {
+                result.className = 'result-box invalid';
+                result.textContent = 'Invalid YAML: ' + e.message;
+                copyBtn.style.display = 'none';
+            }
+        }
+
+        function clearYAML() {
+            document.getElementById('yaml-input').value = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('copy-btn').style.display = 'none';
+        }
+
+        function copyResult() {
+            navigator.clipboard.writeText(document.getElementById('result').textContent).then(() => alert('Copied!'));
+        }
+    </script>
+</body>
+</html>
