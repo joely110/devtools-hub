@@ -3,10 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free developer tools - JSON formatter, SQL formatter, hash generator, regex tester, code minifier, timestamp converter, and more. No signup. Runs entirely in your browser.">
-    <meta name="keywords" content="developer tools, JSON formatter, SQL formatter, hash generator, regex tester, code minifier, timestamp converter, fake data generator, online tools">
-    <title>DevTools Hub - Free Online Developer Tools</title>
+    <meta name="description" content="Free online developer tools - 36 tools for coding, formatting, testing, and more. JSON, SQL, regex, hash, color, UUID, and much more. No signup required.">
+    <meta name="keywords" content="developer tools, online tools, JSON formatter, SQL formatter, regex tester, hash generator, code minifier, free tools">
+    <title>DevTools Hub - 36+ Free Developer Tools</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .search-container {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px var(--primary-light);
+        }
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+        .category-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .category-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .category-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .category-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .tool-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+        .tool-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--primary);
+            transition: background 0.3s;
+        }
+        .tool-card h3 {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .tool-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 0;
+            line-height: 1.4;
+        }
+        .tool-category {
+            font-size: 0.7rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: auto;
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            padding: 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .stat-item strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .search-input { font-size: 1rem; }
+            .category-filters { gap: 0.4rem; }
+            .category-btn { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -17,11 +158,11 @@
             </a>
             <div class="header-right">
                 <nav class="nav-links">
-                    <a href="index.html">Tools</a>
+                    <a href="#tools">Tools</a>
                     <a href="#about">About</a>
                 </nav>
                 <div class="theme-switcher">
-                    <button class="theme-btn active" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
                     <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
                     <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
                     <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
@@ -33,97 +174,40 @@
     <main>
         <section class="hero">
             <h1>Developer Tools That Just Work</h1>
-            <p>Free, fast, and private. All tools run in your browser — no data is sent to any server.</p>
+            <p>36+ free tools for developers. Format, encode, decode, generate, validate, and more. All in your browser.</p>
         </section>
 
-        <h2 class="section-title">Popular Tools</h2>
-        <section class="tools-grid">
-            <a href="json-formatter.html" class="tool-card">
-                <div class="tool-icon">{ }</div>
-                <h3>JSON Formatter</h3>
-                <p>Format, minify, and validate JSON data</p>
-            </a>
-            <a href="hash-generator.html" class="tool-card">
-                <div class="tool-icon">#</div>
-                <h3>Hash Generator</h3>
-                <p>MD5, SHA-1, SHA-256, SHA-512 hashes</p>
-            </a>
-            <a href="yaml-formatter.html" class="tool-card">
-                <div class="tool-icon">YML</div>
-                <h3>YAML Formatter</h3>
-                <p>Format, validate, convert YAML to JSON</p>
-            </a>
-            <a href="regex-tester.html" class="tool-card">
-                <div class="tool-icon">.*</div>
-                <h3>Regex Tester</h3>
-                <p>Test regular expressions in real-time</p>
-            </a>
-            <a href="jwt-decoder.html" class="tool-card">
-                <div class="tool-icon">JWT</div>
-                <h3>JWT Decoder</h3>
-                <p>Decode and inspect JSON Web Tokens</p>
-            </a>
-            <a href="crontab-generator.html" class="tool-card">
-                <div class="tool-icon">cron</div>
-                <h3>Crontab Generator</h3>
-                <p>Build cron schedule expressions</p>
-            </a>
-            <a href="color-converter.html" class="tool-card">
-                <div class="tool-icon" style="font-size:1.5rem;">🎨</div>
-                <h3>Color Converter</h3>
-                <p>Convert HEX, RGB, HSL colors</p>
-            </a>
-            <a href="base64-tool.html" class="tool-card">
-                <div class="tool-icon">B64</div>
-                <h3>Base64 Encoder</h3>
-                <p>Encode and decode Base64 strings</p>
-            </a>
-            <a href="url-encoder.html" class="tool-card">
-                <div class="tool-icon">%20</div>
-                <h3>URL Encoder</h3>
-                <p>Encode or decode URL strings</p>
-            </a>
-            <a href="uuid-generator.html" class="tool-card">
-                <div class="tool-icon">ID</div>
-                <h3>UUID Generator</h3>
-                <p>Generate UUID v4 strings instantly</p>
-            </a>
-            <a href="password-generator.html" class="tool-card">
-                <div class="tool-icon">***</div>
-                <h3>Password Generator</h3>
-                <p>Create secure random passwords</p>
-            </a>
-            <a href="timestamp-converter.html" class="tool-card">
-                <div class="tool-icon">Unix</div>
-                <h3>Timestamp Converter</h3>
-                <p>Convert Unix timestamps to dates</p>
-            </a>
-            <a href="code-minifier.html" class="tool-card">
-                <div class="tool-icon">&lt;/&gt;</div>
-                <h3>Code Minifier</h3>
-                <p>Minify HTML, CSS, and JavaScript</p>
-            </a>
-            <a href="sql-formatter.html" class="tool-card">
-                <div class="tool-icon">SQL</div>
-                <h3>SQL Formatter</h3>
-                <p>Format and beautify SQL queries</p>
-            </a>
-            <a href="fake-data-generator.html" class="tool-card">
-                <div class="tool-icon">{x}</div>
-                <h3>Fake Data Generator</h3>
-                <p>Generate fake names, emails, addresses</p>
-            </a>
-            <a href="slug-generator.html" class="tool-card">
-                <div class="tool-icon">/</div>
-                <h3>Slug Generator</h3>
-                <p>Create URL-friendly slugs</p>
-            </a>
-            <a href="credit-card-generator.html" class="tool-card">
-                <div class="tool-icon">****</div>
-                <h3>Credit Card Generator</h3>
-                <p>Generate test card numbers</p>
-            </a>
-        </section>
+        <div class="stats-bar">
+            <div class="stat-item"><strong>36+</strong> Tools</div>
+            <div class="stat-item"><strong>100%</strong> Free</div>
+            <div class="stat-item"><strong>0</strong> Signup Required</div>
+            <div class="stat-item"><strong>100%</strong> Private</div>
+        </div>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" class="search-input" placeholder="Search tools by name or description..." autocomplete="off">
+        </div>
+
+        <div class="category-filters" id="category-filters">
+            <button class="category-btn active" data-category="all">All Tools</button>
+            <button class="category-btn" data-category="formatters">Formatters</button>
+            <button class="category-btn" data-category="encoders">Encoders</button>
+            <button class="category-btn" data-category="generators">Generators</button>
+            <button class="category-btn" data-category="validators">Validators</button>
+            <button class="category-btn" data-category="converters">Converters</button>
+            <button class="category-btn" data-category="data">Data Tools</button>
+            <button class="category-btn" data-category="devtools">Dev Tools</button>
+        </div>
+
+        <div class="tools-grid" id="tools-grid">
+            <!-- Tools will be populated by JavaScript -->
+        </div>
+
+        <div class="no-results" id="no-results" style="display:none;">
+            <p style="font-size:1.2rem;">No tools found matching your search.</p>
+            <p style="margin-top:0.5rem;">Try different keywords or browse all categories.</p>
+        </div>
 
         <section class="features" id="about">
             <div class="feature">
@@ -157,9 +241,114 @@
             localStorage.setItem('theme', theme);
         }
 
-        // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme);
+
+        const tools = [
+            // Formatters
+            { name: 'JSON Formatter', file: 'json-formatter.html', icon: '{ }', desc: 'Format, minify, and validate JSON data', category: 'formatters' },
+            { name: 'SQL Formatter', file: 'sql-formatter.html', icon: 'SQL', desc: 'Format and beautify SQL queries', category: 'formatters' },
+            { name: 'YAML Formatter', file: 'yaml-formatter.html', icon: 'YML', desc: 'Format, validate, convert YAML to JSON', category: 'formatters' },
+            { name: 'Code Minifier', file: 'code-minifier.html', icon: '</>', desc: 'Minify HTML, CSS, and JavaScript', category: 'formatters' },
+            { name: 'XML Validator', file: 'xml-validator.html', icon: '< >', desc: 'Validate and format XML documents', category: 'formatters' },
+            { name: 'JSON Validator', file: 'json-validator.html', icon: '{ }', desc: 'Validate JSON syntax and structure', category: 'validators' },
+            { name: 'YAML Validator', file: 'yaml-validator.html', icon: 'YML', desc: 'Validate YAML syntax and structure', category: 'validators' },
+
+            // Encoders
+            { name: 'Base64 Encoder', file: 'base64-tool.html', icon: 'B64', desc: 'Encode and decode Base64 strings', category: 'encoders' },
+            { name: 'URL Encoder', file: 'url-encoder.html', icon: '%20', desc: 'Encode or decode URL strings', category: 'encoders' },
+            { name: 'HTML Entity Encoder', file: 'html-entity-encoder.html', icon: '&amp;', desc: 'Encode special characters to HTML entities', category: 'encoders' },
+            { name: 'Unicode Escape', file: 'unicode-escape.html', icon: 'U', desc: 'Convert text to Unicode escape sequences', category: 'encoders' },
+            { name: 'ROT13 Encoder', file: 'rot13-encoder.html', icon: 'R13', desc: 'Encode and decode ROT13 cipher', category: 'encoders' },
+            { name: 'Text to Binary', file: 'text-to-binary.html', icon: '01', desc: 'Convert text to binary and vice versa', category: 'encoders' },
+
+            // Generators
+            { name: 'Hash Generator', file: 'hash-generator.html', icon: '#', desc: 'MD5, SHA-1, SHA-256, SHA-512 hashes', category: 'generators' },
+            { name: 'UUID Generator', file: 'uuid-generator.html', icon: 'ID', desc: 'Generate UUID v4 strings instantly', category: 'generators' },
+            { name: 'UUID Bulk Generator', file: 'uuid-bulk-generator.html', icon: 'IDs', desc: 'Generate multiple UUIDs at once', category: 'generators' },
+            { name: 'Password Generator', file: 'password-generator.html', icon: '***', desc: 'Create secure random passwords', category: 'generators' },
+            { name: 'Fake Data Generator', file: 'fake-data-generator.html', icon: '{x}', desc: 'Generate fake names, emails, addresses', category: 'generators' },
+            { name: 'Lorem Ipsum Generator', file: 'lorem-ipsum-generator.html', icon: 'L', desc: 'Generate placeholder text for mockups', category: 'generators' },
+            { name: 'Random Number Generator', file: 'random-number-generator.html', icon: '🎲', desc: 'Generate random numbers for testing', category: 'generators' },
+            { name: 'Random IP Generator', file: 'random-ip-generator.html', icon: 'IP', desc: 'Generate random IP addresses', category: 'generators' },
+            { name: 'Credit Card Generator', file: 'credit-card-generator.html', icon: '****', desc: 'Generate test card numbers', category: 'generators' },
+            { name: 'Slug Generator', file: 'slug-generator.html', icon: '/', desc: 'Create URL-friendly slugs', category: 'generators' },
+
+            // Validators
+            { name: 'Regex Tester', file: 'regex-tester.html', icon: '.*', desc: 'Test regular expressions in real-time', category: 'validators' },
+            { name: 'Email Validator', file: 'email-validator.html', icon: '@', desc: 'Validate email address format', category: 'validators' },
+            { name: 'JWT Decoder', file: 'jwt-decoder.html', icon: 'JWT', desc: 'Decode and inspect JSON Web Tokens', category: 'validators' },
+
+            // Converters
+            { name: 'Color Converter', file: 'color-converter.html', icon: '🎨', desc: 'Convert HEX, RGB, HSL colors', category: 'converters' },
+            { name: 'Case Converter', file: 'case-converter.html', icon: 'Aa', desc: 'Convert text between different cases', category: 'converters' },
+            { name: 'Number Base Converter', file: 'number-base-converter.html', icon: '2/10', desc: 'Convert binary, decimal, hex, octal', category: 'converters' },
+            { name: 'Markdown to HTML', file: 'markdown-to-html.html', icon: 'MD', desc: 'Convert Markdown syntax to HTML', category: 'converters' },
+
+            // Data Tools
+            { name: 'Timestamp Converter', file: 'timestamp-converter.html', icon: 'Unix', desc: 'Convert Unix timestamps to dates', category: 'data' },
+            { name: 'Date Calculator', file: 'date-calculator.html', icon: '📅', desc: 'Calculate days between dates', category: 'data' },
+            { name: 'Word Counter', file: 'word-counter.html', icon: 'W', desc: 'Count words, characters, sentences', category: 'data' },
+            { name: 'Percentage Calculator', file: 'percentage-calculator.html', icon: '%', desc: 'Calculate percentages and ratios', category: 'data' },
+            { name: 'Prime Checker', file: 'prime-checker.html', icon: 'P', desc: 'Check if a number is prime', category: 'data' },
+
+            // Dev Tools
+            { name: 'Crontab Generator', file: 'crontab-generator.html', icon: 'cron', desc: 'Build cron schedule expressions', category: 'devtools' },
+            { name: 'User Agent Parser', file: 'user-agent-parser.html', icon: 'UA', desc: 'Parse browser user agent strings', category: 'devtools' },
+        ];
+
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        function renderTools() {
+            const grid = document.getElementById('tools-grid');
+            const noResults = document.getElementById('no-results');
+
+            let filtered = tools;
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(t => t.category === currentCategory);
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(t =>
+                    t.name.toLowerCase().includes(q) ||
+                    t.desc.toLowerCase().includes(q)
+                );
+            }
+
+            if (filtered.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            grid.innerHTML = filtered.map(tool => `
+                <a href="${tool.file}" class="tool-card">
+                    <div class="tool-icon">${tool.icon}</div>
+                    <h3>${tool.name}</h3>
+                    <p>${tool.desc}</p>
+                </a>
+            `).join('');
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderTools();
+        });
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                renderTools();
+            });
+        });
+
+        renderTools();
     </script>
 </body>
 </html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate percentage increase, decrease, and ratios. Free percentage calculator for discounts, tips, and more.">
+    <meta name="keywords" content="percentage calculator, percent calculator, discount calculator, tip calculator">
+    <title>Percentage Calculator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Percentage Calculator</h1><p>Calculate percentages, increases, decreases, and ratios</p></div>
+
+        <div class="card">
+            <div class="card-title">Basic Percentage</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <input type="number" id="pct-value" placeholder="Value" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <span>% of</span>
+                <input type="number" id="pct-total" placeholder="Total" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="calcBasicPct()">Calculate</button>
+            </div>
+            <div id="basic-result" style="margin-top:1rem;font-size:1.2rem;font-weight:600;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Percentage Change</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;">From</label>
+                    <input type="number" id="change-from" placeholder="Original" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                </div>
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;">To</label>
+                    <input type="number" id="change-to" placeholder="New" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                </div>
+                <button class="btn btn-primary" onclick="calcChange()" style="margin-top:1.25rem;">Calculate Change</button>
+            </div>
+            <div id="change-result" style="margin-top:1rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">What percentage is X of Y?</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <input type="number" id="pct-part" placeholder="Part" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <span>is what % of</span>
+                <input type="number" id="pct-whole" placeholder="Whole" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="calcWhatPct()">Calculate</button>
+            </div>
+            <div id="what-pct-result" style="margin-top:1rem;font-size:1.2rem;font-weight:600;"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function calcBasicPct() {
+            const val = parseFloat(document.getElementById('pct-value').value);
+            const total = parseFloat(document.getElementById('pct-total').value);
+            if (isNaN(val) || isNaN(total)) { alert('Please enter valid numbers.'); return; }
+            const result = (val / 100) * total;
+            document.getElementById('basic-result').textContent = `${val}% of ${total} = ${result.toFixed(2)}`;
+        }
+
+        function calcChange() {
+            const from = parseFloat(document.getElementById('change-from').value);
+            const to = parseFloat(document.getElementById('change-to').value);
+            if (isNaN(from) || isNaN(to)) { alert('Please enter valid numbers.'); return; }
+            const change = ((to - from) / from * 100).toFixed(2);
+            const isIncrease = change >= 0;
+            document.getElementById('change-result').innerHTML = `<div class="output-box ${isIncrease ? 'success' : 'error'}" style="font-size:1.1rem;">${isIncrease ? '↑' : '↓'} ${Math.abs(change)}% ${isIncrease ? 'increase' : 'decrease'}</div>`;
+        }
+
+        function calcWhatPct() {
+            const part = parseFloat(document.getElementById('pct-part').value);
+            const whole = parseFloat(document.getElementById('pct-whole').value);
+            if (isNaN(part) || isNaN(whole) || whole === 0) { alert('Please enter valid numbers.'); return; }
+            const pct = (part / whole * 100).toFixed(2);
+            document.getElementById('what-pct-result').textContent = `${part} is ${pct}% of ${whole}`;
+        }
+    </script>
+</body>
+</html>

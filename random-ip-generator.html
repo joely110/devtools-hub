@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate random IP addresses. IPv4 and IPv6. Free online random IP generator for testing.">
+    <meta name="keywords" content="random IP, IP generator, fake IP, test IP address">
+    <title>Random IP Generator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Random IP Generator</h1><p>Generate random IP addresses for testing</p></div>
+
+        <div class="card">
+            <div class="card-title">Generate IPs</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Count</label>
+                    <input type="number" id="count" value="10" min="1" max="100" style="width:100px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                </div>
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Type</label>
+                    <select id="ip-type" style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text);">
+                        <option value="v4">IPv4</option>
+                        <option value="v6">IPv6</option>
+                        <option value="both">Both</option>
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generate()">Generate</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Generated IPs</div>
+            <textarea id="output" style="height:250px;font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyAll()">Copy All</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function randomIPv4() {
+            return `${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}`;
+        }
+
+        function randomIPv6() {
+            const hex = () => Math.floor(Math.random()*65536).toString(16).padStart(4, '0');
+            return `${hex()}:${hex()}:${hex()}:${hex()}:${hex()}:${hex()}:${hex()}:${hex()}`;
+        }
+
+        function generate() {
+            const count = Math.min(Math.max(parseInt(document.getElementById('count').value) || 10, 1), 100);
+            const type = document.getElementById('ip-type').value;
+            const ips = [];
+            for (let i = 0; i < count; i++) {
+                if (type === 'v6') ips.push(randomIPv6());
+                else if (type === 'v4') ips.push(randomIPv4());
+                else ips.push(Math.random() > 0.5 ? randomIPv4() : randomIPv6());
+            }
+            document.getElementById('output').value = ips.join('\n');
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function copyAll() { navigator.clipboard.writeText(document.getElementById('output').value).then(() => alert('IPs copied!')); }
+    </script>
+</body>
+</html>

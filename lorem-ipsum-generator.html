@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate Lorem Ipsum placeholder text. Create paragraphs, sentences, or lists of random text for design mockups.">
+    <meta name="keywords" content="lorem ipsum, lorem generator, placeholder text, dummy text, fake text">
+    <title>Lorem Ipsum Generator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Lorem Ipsum Generator</h1><p>Generate placeholder text for design mockups</p></div>
+
+        <div class="card">
+            <div class="card-title">Options</div>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;">
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Type</label>
+                    <select id="type" style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text);">
+                        <option value="paragraphs">Paragraphs</option>
+                        <option value="sentences">Sentences</option>
+                        <option value="words">Words</option>
+                        <option value="lists">Lists</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Count</label>
+                    <input type="number" id="count" value="3" min="1" max="50" style="width:100px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generate()">Generate</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Generated Text</div>
+            <textarea id="output" style="height:300px;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyOutput()">Copy</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        const words = ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'ex', 'ea', 'commodo', 'consequat', 'duis', 'aute', 'irure', 'in', 'reprehenderit', 'voluptate', 'velit', 'esse', 'cillum', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint', 'occaecat', 'cupidatat', 'non', 'proident', 'sunt', 'culpa', 'qui', 'officia', 'deserunt', 'mollit', 'anim', 'id', 'est', 'laborum', 'aut', 'in', 'qui', 'officia', 'deserunt', 'mollit', 'anim', 'id', 'est', 'laborum', 'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit', 'sed', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip'];
+
+        function generate() {
+            const type = document.getElementById('type').value;
+            const count = Math.min(Math.max(parseInt(document.getElementById('count').value) || 3, 1), 50);
+            let result = '';
+
+            if (type === 'words') {
+                const w = [];
+                for (let i = 0; i < count; i++) w.push(words[Math.floor(Math.random() * words.length)]);
+                result = w.join(' ');
+            } else if (type === 'sentences') {
+                for (let i = 0; i < count; i++) {
+                    const s = [];
+                    const len = Math.floor(Math.random() * 10) + 8;
+                    for (let j = 0; j < len; j++) s.push(words[Math.floor(Math.random() * words.length)]);
+                    result += s.join(' ') + '. ';
+                }
+            } else if (type === 'paragraphs') {
+                for (let i = 0; i < count; i++) {
+                    const p = [];
+                    for (let j = 0; j < 5; j++) {
+                        const s = [];
+                        const len = Math.floor(Math.random() * 15) + 8;
+                        for (let k = 0; k < len; k++) s.push(words[Math.floor(Math.random() * words.length)]);
+                        p.push(s.join(' ') + '.');
+                    }
+                    result += p.join(' ') + '\n\n';
+                }
+            } else if (type === 'lists') {
+                for (let i = 0; i < count; i++) {
+                    const items = [];
+                    const len = Math.floor(Math.random() * 5) + 3;
+                    for (let j = 0; j < len; j++) {
+                        const s = [];
+                        const wlen = Math.floor(Math.random() * 4) + 2;
+                        for (let k = 0; k < wlen; k++) s.push(words[Math.floor(Math.random() * words.length)]);
+                        items.push(s.join(' '));
+                    }
+                    result += '• ' + items.join('\n• ') + '\n\n';
+                }
+            }
+
+            document.getElementById('output').value = result.trim();
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('output').value).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>

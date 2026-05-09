@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Count words, characters, and lines in text. Get detailed text statistics instantly. Free word counter tool.">
+    <meta name="keywords" content="word counter, character count, line count, text statistics, count words">
+    <title>Word Counter - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Word Counter</h1><p>Count words, characters, sentences, and paragraphs</p></div>
+
+        <div class="card">
+            <div class="card-title">Text Input</div>
+            <textarea id="input" placeholder="Enter or paste your text here..." style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="count()">Count</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Statistics</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1rem;margin-top:1rem;">
+                <div class="result-item"><label>Words</label><code id="words" style="font-size:1.3rem;"></code></div>
+                <div class="result-item"><label>Characters</label><code id="chars" style="font-size:1.3rem;"></code></div>
+                <div class="result-item"><label>Sentences</label><code id="sentences" style="font-size:1.3rem;"></code></div>
+                <div class="result-item"><label>Paragraphs</label><code id="paragraphs" style="font-size:1.3rem;"></code></div>
+                <div class="result-item"><label>Lines</label><code id="lines" style="font-size:1.3rem;"></code></div>
+                <div class="result-item"><label>Reading Time</label><code id="reading" style="font-size:1.3rem;"></code></div>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function count() {
+            const text = document.getElementById('input').value;
+            if (!text.trim()) { alert('Please enter text first.'); return; }
+            const words = text.trim().split(/\s+/).filter(w => w).length;
+            const chars = text.length;
+            const sentences = (text.match(/[.!?]+/g) || []).length;
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim()).length;
+            const lines = text.split('\n').length;
+            const readingTime = Math.ceil(words / 200);
+
+            document.getElementById('words').textContent = words;
+            document.getElementById('chars').textContent = chars;
+            document.getElementById('sentences').textContent = sentences;
+            document.getElementById('paragraphs').textContent = Math.max(paragraphs, 1);
+            document.getElementById('lines').textContent = lines;
+            document.getElementById('reading').textContent = readingTime + ' min';
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function clearInput() { document.getElementById('input').value = ''; document.getElementById('result-card').style.display = 'none'; }
+    </script>
+</body>
+</html>

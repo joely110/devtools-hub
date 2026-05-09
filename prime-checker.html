@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Check if a number is prime. Find prime numbers in a range. Free prime number checker tool.">
+    <meta name="keywords" content="prime checker, prime number, is prime, prime calculator">
+    <title>Prime Number Checker - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Prime Number Checker</h1><p>Check if a number is prime or find primes in a range</p></div>
+
+        <div class="card">
+            <div class="card-title">Check Single Number</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <input type="number" id="prime-input" placeholder="Enter a number" style="width:150px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="checkPrime()">Check</button>
+            </div>
+            <div id="single-result" style="margin-top:1rem;font-size:1.2rem;font-weight:600;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Find Primes in Range</div>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;">
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">From</label>
+                    <input type="number" id="range-from" value="1" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                </div>
+                <div>
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">To</label>
+                    <input type="number" id="range-to" value="100" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="findPrimes()">Find Primes</button>
+            </div>
+            <div id="range-result" style="margin-top:1rem;"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function isPrime(n) {
+            if (n < 2) return false;
+            if (n === 2) return true;
+            if (n % 2 === 0) return false;
+            for (let i = 3; i <= Math.sqrt(n); i += 2) if (n % i === 0) return false;
+            return true;
+        }
+
+        function checkPrime() {
+            const n = parseInt(document.getElementById('prime-input').value);
+            if (isNaN(n)) { alert('Please enter a valid number.'); return; }
+            const result = document.getElementById('single-result');
+            result.textContent = isPrime(n) ? `✓ ${n} is prime` : `✗ ${n} is not prime`;
+            result.style.color = isPrime(n) ? 'var(--success)' : 'var(--error)';
+        }
+
+        function findPrimes() {
+            const from = parseInt(document.getElementById('range-from').value) || 1;
+            const to = parseInt(document.getElementById('range-to').value) || 100;
+            if (from > to) { alert('Start must be less than End.'); return; }
+            const primes = [];
+            for (let i = from; i <= to; i++) if (isPrime(i)) primes.push(i);
+            const resultDiv = document.getElementById('range-result');
+            if (primes.length === 0) {
+                resultDiv.innerHTML = '<div class="output-box">No prime numbers found in this range.</div>';
+            } else {
+                resultDiv.innerHTML = `<div class="output-box" style="max-height:300px;overflow-y:auto;">Found ${primes.length} prime(s):<br>${primes.join(', ')}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

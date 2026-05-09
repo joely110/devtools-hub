@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate random UUIDs (v4) in bulk. Create multiple UUIDs instantly for testing and development.">
+    <meta name="keywords" content="uuid generator, bulk uuid, uuid v4, random uuid, guid generator">
+    <title>UUID Bulk Generator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>UUID Bulk Generator</h1><p>Generate multiple UUIDs at once for testing</p></div>
+
+        <div class="card">
+            <div class="card-title">Number of UUIDs</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <input type="number" id="count" value="10" min="1" max="1000" style="width:120px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="generate()">Generate UUIDs</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Generated UUIDs</div>
+            <textarea id="output" style="height:300px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyAll()">Copy All</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function uuidv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0;
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            });
+        }
+
+        function generate() {
+            const count = Math.min(Math.max(parseInt(document.getElementById('count').value) || 10, 1), 1000);
+            const uuids = [];
+            for (let i = 0; i < count; i++) uuids.push(uuidv4());
+            document.getElementById('output').value = uuids.join('\n');
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function copyAll() { navigator.clipboard.writeText(document.getElementById('output').value).then(() => alert('UUIDs copied!')); }
+    </script>
+</body>
+</html>

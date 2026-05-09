@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate days between two dates. Add or subtract days from any date. Free date calculator tool.">
+    <meta name="keywords" content="days between dates, date calculator, add days, days calculator">
+    <title>Date Calculator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Date Calculator</h1><p>Calculate days between dates, add or subtract days</p></div>
+
+        <div class="card">
+            <div class="card-title">Days Between Dates</div>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;">
+                <div style="flex:1;min-width:150px;">
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Start Date</label>
+                    <input type="date" id="start-date" style="width:100%;padding:0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text);">
+                </div>
+                <div style="flex:1;min-width:150px;">
+                    <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">End Date</label>
+                    <input type="date" id="end-date" style="width:100%;padding:0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text);">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="calcDays()">Calculate Days</button>
+            </div>
+            <div id="days-result" style="margin-top:1rem;font-size:1.1rem;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Add/Subtract Days</div>
+            <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:1rem;">
+                <input type="date" id="base-date" style="padding:0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text);">
+                <input type="number" id="days-offset" value="7" style="width:100px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="addDays()">Add Days</button>
+                <button class="btn btn-secondary" onclick="subDays()">Subtract</button>
+            </div>
+            <div id="offset-result" style="margin-top:1rem;font-size:1.1rem;"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function calcDays() {
+            const start = new Date(document.getElementById('start-date').value);
+            const end = new Date(document.getElementById('end-date').value);
+            if (isNaN(start) || isNaN(end)) { alert('Please select both dates.'); return; }
+            const diff = Math.abs(end - start);
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('days-result').innerHTML = `<div class="output-box">The difference is <strong>${days}</strong> day(s)</div>`;
+        }
+
+        function addDays() {
+            const date = new Date(document.getElementById('base-date').value);
+            const offset = parseInt(document.getElementById('days-offset').value) || 0;
+            if (isNaN(date.getTime())) { alert('Please select a date.'); return; }
+            date.setDate(date.getDate() + offset);
+            document.getElementById('offset-result').innerHTML = `<div class="output-box success">Result: <strong>${date.toLocaleDateString()}</strong></div>`;
+        }
+
+        function subDays() {
+            const date = new Date(document.getElementById('base-date').value);
+            const offset = parseInt(document.getElementById('days-offset').value) || 0;
+            if (isNaN(date.getTime())) { alert('Please select a date.'); return; }
+            date.setDate(date.getDate() - offset);
+            document.getElementById('offset-result').innerHTML = `<div class="output-box success">Result: <strong>${date.toLocaleDateString()}</strong></div>`;
+        }
+    </script>
+</body>
+</html>

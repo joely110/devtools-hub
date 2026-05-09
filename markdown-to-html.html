@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert Markdown to HTML instantly. Preview formatted output. Free Markdown to HTML converter.">
+    <meta name="keywords" content="markdown to html, md to html, markdown converter, markdown preview">
+    <title>Markdown to HTML - DevTools Hub</title>
+    < link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Markdown to HTML</h1><p>Convert Markdown syntax to HTML</p></div>
+
+        <div class="card">
+            <div class="card-title">Markdown Input</div>
+            <textarea id="md-input" placeholder="# Heading&#10;&#10;**Bold text** and *italic text*&#10;&#10;- List item 1&#10;- List item 2" style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="convert()">Convert to HTML</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">HTML Output</div>
+            <textarea id="html-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyHTML()">Copy HTML</button>
+            </div>
+        </div>
+
+        <div class="card" id="preview-card" style="display:none;">
+            <div class="card-title">Live Preview</div>
+            <div id="preview" style="padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function mdToHtml(md) {
+            let html = md
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/`(.+?)`/g, '<code>$1</code>')
+                .replace(/^\- (.+)$/gm, '<li>$1</li>')
+                .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            return '<p>' + html + '</p>';
+        }
+
+        function convert() {
+            const md = document.getElementById('md-input').value;
+            if (!md.trim()) { alert('Please enter Markdown first.'); return; }
+            const html = mdToHtml(md);
+            document.getElementById('html-output').value = html;
+            document.getElementById('preview').innerHTML = html;
+            document.getElementById('result-card').style.display = 'block';
+            document.getElementById('preview-card').style.display = 'block';
+        }
+
+        function clearInput() { document.getElementById('md-input').value = ''; document.getElementById('html-output').value = ''; document.getElementById('preview').innerHTML = ''; document.getElementById('result-card').style.display = 'none'; document.getElementById('preview-card').style.display = 'none'; }
+        function copyHTML() { navigator.clipboard.writeText(document.getElementById('html-output').value).then(() => alert('HTML copied!')); }
+    </script>
+</body>
+</html>

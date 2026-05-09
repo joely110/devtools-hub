@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Validate email addresses online. Check email format and domain validity. Free email validator tool.">
+    <meta name="keywords" content="email validator, validate email, email check, email format">
+    <title>Email Validator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Email Validator</h1><p>Validate email address format</p></div>
+
+        <div class="card">
+            <div class="card-title">Enter Email Address</div>
+            <input type="text" id="email-input" placeholder="user@example.com" style="margin-top:1rem;">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="validate()">Validate</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Result</div>
+            <div id="result" class="output-box"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Batch Validate</div>
+            <textarea id="batch-input" placeholder="Enter multiple emails (one per line)..." style="height:150px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="batchValidate()">Validate All</button>
+            </div>
+        </div>
+
+        <div class="card" id="batch-result" style="display:none;">
+            <div class="card-title">Batch Results</div>
+            <div id="batch-output"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function isValidEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+            return regex.test(email);
+        }
+
+        function validate() {
+            const email = document.getElementById('email-input').value.trim();
+            if (!email) { alert('Please enter an email address.'); return; }
+            const valid = isValidEmail(email);
+            const resultEl = document.getElementById('result');
+            resultEl.className = 'output-box ' + (valid ? 'success' : 'error');
+            resultEl.textContent = valid ? '✓ Valid email address' : '✗ Invalid email address';
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function batchValidate() {
+            const input = document.getElementById('batch-input').value.trim();
+            if (!input) { alert('Please enter emails to validate.'); return; }
+            const emails = input.split('\n').filter(e => e.trim());
+            const results = emails.map(email => {
+                const valid = isValidEmail(email.trim());
+                return `<div style="padding:0.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;"><span style="font-family:monospace;">${email.trim()}</span><span style="color:${valid?'var(--success)':'var(--error)'};">${valid?'✓ Valid':'✗ Invalid'}</span></div>`;
+            }).join('');
+            document.getElementById('batch-output').innerHTML = results;
+            document.getElementById('batch-result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

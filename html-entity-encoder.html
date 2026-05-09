@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Encode and decode HTML entities online. Convert special characters to HTML entities and back. Free tool for web developers.">
+    <meta name="keywords" content="html entities, entity encoder, entity decoder, special characters, escape html">
+    <title>HTML Entity Encoder/Decoder - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>HTML Entity Encoder</h1><p>Encode or decode special characters to HTML entities</p></div>
+
+        <div class="card">
+            <div class="card-title">Input Text</div>
+            <textarea id="input-text" placeholder="Enter text to encode or decode..." style="height:150px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="encode()">Encode</button>
+                <button class="btn btn-primary" onclick="decode()">Decode</button>
+                <button class="btn btn-secondary" onclick="clearText()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Output</div>
+            <textarea id="output-text" style="height:150px;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyOutput()">Copy</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Common Entities Reference</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;margin-top:1rem;font-family:monospace;font-size:0.85rem;">
+                <div><code>&amp;</code> → &amp;amp;</div>
+                <div><code>&lt;</code> → &amp;lt;</div>
+                <div><code>&gt;</code> → &amp;gt;</div>
+                <div><code>"</code> → &amp;quot;</div>
+                <div><code>'</code> → &amp;apos;</div>
+                <div><code>©</code> → &amp;copy;</div>
+                <div><code>™</code> → &amp;trade;</div>
+                <div><code>®</code> → &amp;reg;</div>
+                <div><code>&nbsp;</code> → &amp;nbsp;</div>
+                <div><code>&para;</code> → &para;</div>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function encode() {
+            const input = document.getElementById('input-text').value;
+            if (!input) { alert('Please enter some text first.'); return; }
+            const encoded = input.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+            document.getElementById('output-text').value = encoded;
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function decode() {
+            const input = document.getElementById('input-text').value;
+            if (!input) { alert('Please enter some text first.'); return; }
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = input;
+            document.getElementById('output-text').value = textarea.value;
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function clearText() { document.getElementById('input-text').value = ''; document.getElementById('output-text').value = ''; document.getElementById('result-card').style.display = 'none'; }
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('output-text').value).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>

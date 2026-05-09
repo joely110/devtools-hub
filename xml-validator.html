@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Validate XML syntax online. Check XML structure and formatting. Get detailed error messages with line numbers.">
+    <meta name="keywords" content="xml validator, xml parser, validate xml, xml check, xml syntax">
+    <title>XML Validator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>XML Validator</h1><p>Validate and format XML documents</p></div>
+
+        <div class="card">
+            <div class="card-title">XML Input</div>
+            <textarea id="xml-input" placeholder="<root><item>Hello</item></root>" style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="validate()">Validate</button>
+                <button class="btn btn-primary" onclick="format()">Format</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-valid" style="display:none;">
+            <div class="output-box success">✓ Valid XML</div>
+        </div>
+
+        <div class="card" id="result-error" style="display:none;">
+            <div class="error-box" id="error-message"></div>
+        </div>
+
+        <div class="card" id="result-output" style="display:none;">
+            <div class="card-title">Formatted Output</div>
+            <textarea id="output" style="height:200px;" readonly></textarea>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function validate() {
+            const input = document.getElementById('xml-input').value;
+            if (!input.trim()) { alert('Please enter XML first.'); return; }
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(input, 'text/xml');
+                const error = doc.querySelector('parsererror');
+                if (error) throw new Error(error.textContent);
+                document.getElementById('result-valid').style.display = 'block';
+                document.getElementById('result-error').style.display = 'none';
+            } catch (e) {
+                document.getElementById('result-valid').style.display = 'none';
+                document.getElementById('result-error').style.display = 'block';
+                document.getElementById('error-message').textContent = e.message;
+            }
+        }
+
+        function format() {
+            const input = document.getElementById('xml-input').value;
+            if (!input.trim()) { alert('Please enter XML first.'); return; }
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(input, 'text/xml');
+                const error = doc.querySelector('parsererror');
+                if (error) throw new Error(error.textContent);
+                const serializer = new XMLSerializer();
+                let xml = serializer.serializeToString(doc);
+                let formatted = '';
+                let indent = 0;
+                xml = xml.replace(/>\s*</g, '><');
+                const parts = xml.split(/(<[^>]+>)/);
+                parts.forEach(part => {
+                    if (!part.trim()) return;
+                    if (part.match(/<\/\w/)) indent--;
+                    formatted += '  '.repeat(Math.max(0, indent)) + part.trim() + '\n';
+                    if (part.match(/<\w[^>]*[^\/]>$/) && !part.startsWith('</') && !part.startsWith('<?')) indent++;
+                });
+                document.getElementById('output').value = formatted.trim();
+                document.getElementById('result-output').style.display = 'block';
+                document.getElementById('result-valid').style.display = 'block';
+                document.getElementById('result-error').style.display = 'none';
+            } catch (e) {
+                document.getElementById('result-valid').style.display = 'none';
+                document.getElementById('result-error').style.display = 'block';
+                document.getElementById('error-message').textContent = e.message;
+            }
+        }
+
+        function clearInput() { document.getElementById('xml-input').value = ''; document.getElementById('output').value = ''; document.getElementById('result-valid').style.display = 'none'; document.getElementById('result-error').style.display = 'none'; document.getElementById('result-output').style.display = 'none'; }
+    </script>
+</body>
+</html>

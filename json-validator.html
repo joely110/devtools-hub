@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Validate JSON data online. Check JSON syntax, format, and structure. Instant validation with error details.">
+    <meta name="keywords" content="json validator, json parser, json check, validate json, json syntax">
+    <title>JSON Validator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>JSON Validator</h1><p>Validate and check JSON syntax instantly</p></div>
+
+        <div class="card">
+            <div class="card-title">JSON Input</div>
+            <textarea id="json-input" placeholder='{"name": "John", "age": 30}' style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="validate()">Validate</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-valid" style="display:none;">
+            <div class="card-title">Result</div>
+            <div class="output-box success">✓ Valid JSON</div>
+        </div>
+
+        <div class="card" id="result-error" style="display:none;">
+            <div class="card-title">Error</div>
+            <div class="error-box" id="error-message"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function validate() {
+            const input = document.getElementById('json-input').value;
+            if (!input.trim()) { alert('Please enter JSON first.'); return; }
+            try {
+                JSON.parse(input);
+                document.getElementById('result-valid').style.display = 'block';
+                document.getElementById('result-error').style.display = 'none';
+            } catch (e) {
+                document.getElementById('result-valid').style.display = 'none';
+                document.getElementById('result-error').style.display = 'block';
+                document.getElementById('error-message').textContent = e.message;
+            }
+        }
+
+        function clearInput() { document.getElementById('json-input').value = ''; document.getElementById('result-valid').style.display = 'none'; document.getElementById('result-error').style.display = 'none'; }
+    </script>
+</body>
+</html>

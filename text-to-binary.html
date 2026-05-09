@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert text to binary or binary to text. Free online binary translator tool for developers.">
+    <meta name="keywords" content="text to binary, binary to text, binary converter, binary translator, text binary">
+    <title>Text to Binary Converter - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Text to Binary</h1><p>Convert text to binary and vice versa</p></div>
+
+        <div class="card">
+            <div class="card-title">Input</div>
+            <textarea id="input" placeholder="Enter text or binary..." style="height:150px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="toBinary()">Text → Binary</button>
+                <button class="btn btn-primary" onclick="toText()">Binary → Text</button>
+                <button class="btn btn-secondary" onclick="clearText()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Output</div>
+            <textarea id="output" style="height:150px;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyOutput()">Copy</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function toBinary() {
+            const input = document.getElementById('input').value;
+            if (!input) { alert('Please enter text first.'); return; }
+            document.getElementById('output').value = input.split('').map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function toText() {
+            const input = document.getElementById('input').value.trim();
+            if (!input) { alert('Please enter binary first.'); return; }
+            try {
+                document.getElementById('output').value = input.split(' ').map(b => String.fromCharCode(parseInt(b, 2))).join('');
+                document.getElementById('result-card').style.display = 'block';
+            } catch (e) { alert('Invalid binary format.'); }
+        }
+
+        function clearText() { document.getElementById('input').value = ''; document.getElementById('output').value = ''; document.getElementById('result-card').style.display = 'none'; }
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('output').value).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>

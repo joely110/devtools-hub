@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate random numbers for testing. Choose range, quantity, and format. Free random number generator.">
+    <meta name="keywords" content="random number generator, random number, number generator, lottery numbers">
+    <title>Random Number Generator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Random Number Generator</h1><p>Generate random numbers for games, lotteries, or testing</p></div>
+
+        <div class="card">
+            <div class="card-title">Options</div>
+            <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1rem;">
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:120px;">
+                        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Min</label>
+                        <input type="number" id="min-val" value="1" style="width:100%;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                    </div>
+                    <div style="flex:1;min-width:120px;">
+                        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Max</label>
+                        <input type="number" id="max-val" value="100" style="width:100%;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                    </div>
+                    <div style="flex:1;min-width:120px;">
+                        <label style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.25rem;">Count</label>
+                        <input type="number" id="count-val" value="5" min="1" max="100" style="width:100%;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                    </div>
+                </div>
+                <label style="display:flex;align-items:center;gap:0.5rem;"><input type="checkbox" id="unique"> Unique numbers only</label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generate()">Generate</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Result</div>
+            <div id="result" style="font-family:'SF Mono',Monaco,monospace;font-size:1.5rem;text-align:center;padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;"></div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyResult()">Copy</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function generate() {
+            const min = parseInt(document.getElementById('min-val').value);
+            const max = parseInt(document.getElementById('max-val').value);
+            const count = Math.min(parseInt(document.getElementById('count-val').value) || 5, 100);
+            const unique = document.getElementById('unique').checked;
+
+            if (min >= max) { alert('Min must be less than Max.'); return; }
+            if (unique && (max - min + 1) < count) { alert('Not enough unique numbers in range.'); return; }
+
+            let numbers = [];
+            if (unique) {
+                const pool = Array.from({length: max - min + 1}, (_, i) => i + min);
+                for (let i = 0; i < count; i++) {
+                    const idx = Math.floor(Math.random() * pool.length);
+                    numbers.push(pool.splice(idx, 1)[0]);
+                }
+            } else {
+                for (let i = 0; i < count; i++) numbers.push(Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+
+            document.getElementById('result').textContent = numbers.join(', ');
+            window.currentResult = numbers.join(', ');
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function copyResult() { if (window.currentResult) navigator.clipboard.writeText(window.currentResult).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>
