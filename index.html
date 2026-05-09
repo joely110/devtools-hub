@@ -3,81 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free online developer tools - JSON formatter, regex tester, hash generator, YAML formatter, color converter, and more. No signup required.">
-    <meta name="keywords" content="developer tools, JSON formatter, regex tester, hash generator, YAML formatter, online tools, free tools">
+    <meta name="description" content="Free developer tools - JSON formatter, hash generator, YAML formatter, regex tester, color converter, and more. No signup. Runs entirely in your browser.">
+    <meta name="keywords" content="developer tools, JSON formatter, hash generator, regex tester, yaml formatter, online tools">
     <title>DevTools Hub - Free Online Developer Tools</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
-        <h1>DevTools Hub</h1>
-        <p>Free Online Developer Tools — No Signup, No Cost</p>
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span class="logo-text">DevTools Hub</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Tools</a>
+                <a href="#about">About</a>
+            </nav>
+        </div>
     </header>
 
     <main>
         <section class="hero">
-            <h2>Essential Tools for Developers</h2>
-            <p>A collection of free browser-based tools to speed up your development workflow.</p>
+            <h1>Developer Tools That Just Work</h1>
+            <p>Free, fast, and private. All tools run in your browser — no data is sent to any server.</p>
         </section>
 
+        <h2 class="section-title">Popular Tools</h2>
         <section class="tools-grid">
             <a href="json-formatter.html" class="tool-card">
+                <div class="tool-icon">{ }</div>
                 <h3>JSON Formatter</h3>
-                <p>Format, minify, and validate JSON data instantly</p>
-            </a>
-            <a href="yaml-formatter.html" class="tool-card">
-                <h3>YAML Formatter</h3>
-                <p>Format, validate, and convert YAML to JSON</p>
+                <p>Format, minify, and validate JSON data</p>
             </a>
             <a href="hash-generator.html" class="tool-card">
+                <div class="tool-icon">#</div>
                 <h3>Hash Generator</h3>
-                <p>Generate MD5, SHA-1, SHA-256, SHA-512 hashes</p>
+                <p>MD5, SHA-1, SHA-256, SHA-512 hashes</p>
+            </a>
+            <a href="yaml-formatter.html" class="tool-card">
+                <div class="tool-icon">Y</div>
+                <h3>YAML Formatter</h3>
+                <p>Format, validate, convert YAML to JSON</p>
             </a>
             <a href="regex-tester.html" class="tool-card">
+                <div class="tool-icon">.*</div>
                 <h3>Regex Tester</h3>
-                <p>Test and debug regular expressions in real-time</p>
-            </a>
-            <a href="color-converter.html" class="tool-card">
-                <h3>Color Converter</h3>
-                <p>Convert between HEX, RGB, HSL color formats</p>
-            </a>
-            <a href="url-encoder.html" class="tool-card">
-                <h3>URL Encoder/Decoder</h3>
-                <p>Encode or decode URL strings safely</p>
-            </a>
-            <a href="base64-tool.html" class="tool-card">
-                <h3>Base64 Encoder/Decoder</h3>
-                <p>Encode and decode Base64 strings online</p>
+                <p>Test regular expressions in real-time</p>
             </a>
             <a href="jwt-decoder.html" class="tool-card">
+                <div class="tool-icon">JWT</div>
                 <h3>JWT Decoder</h3>
-                <p>Decode and inspect JWT tokens</p>
+                <p>Decode and inspect JSON Web Tokens</p>
+            </a>
+            <a href="crontab-generator.html" class="tool-card">
+                <div class="tool-icon">C</div>
+                <h3>Crontab Generator</h3>
+                <p>Build cron schedule expressions</p>
+            </a>
+            <a href="color-converter.html" class="tool-card">
+                <div class="tool-icon">#</div>
+                <h3>Color Converter</h3>
+                <p>Convert HEX, RGB, HSL colors</p>
+            </a>
+            <a href="base64-tool.html" class="tool-card">
+                <div class="tool-icon">B64</div>
+                <h3>Base64 Encoder</h3>
+                <p>Encode and decode Base64 strings</p>
+            </a>
+            <a href="url-encoder.html" class="tool-card">
+                <div class="tool-icon">&</div>
+                <h3>URL Encoder</h3>
+                <p>Encode or decode URL strings</p>
             </a>
             <a href="uuid-generator.html" class="tool-card">
+                <div class="tool-icon">U</div>
                 <h3>UUID Generator</h3>
                 <p>Generate UUID v4 strings instantly</p>
             </a>
             <a href="password-generator.html" class="tool-card">
+                <div class="tool-icon">***</div>
                 <h3>Password Generator</h3>
                 <p>Create secure random passwords</p>
             </a>
-            <a href="crontab-generator.html" class="tool-card">
-                <h3>Crontab Generator</h3>
-                <p>Build and visualize cron schedule expressions</p>
-            </a>
         </section>
 
-        <section class="seo-content">
-            <h2>Why Use DevTools Hub?</h2>
-            <p>Every developer needs quick access to common utility tools. Instead of installing heavy software or searching through documentation, use our browser-based tools for instant results.</p>
-            <p>All tools run entirely in your browser — <strong>no data is sent to any server</strong>. Perfect for developers, designers, and anyone working with web technologies.</p>
+        <section class="features" id="about">
+            <div class="feature">
+                <div class="feature-icon">&#128274;</div>
+                <h3>100% Private</h3>
+                <p>All processing happens in your browser. No data is ever sent to our servers.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">&#9889;</div>
+                <h3>Instant Results</h3>
+                <p>No waiting, no loading. Get your results immediately.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">&#36;</div>
+                <h3>Completely Free</h3>
+                <p>No signup required, no premium features. Free forever.</p>
+            </div>
         </section>
     </main>
 
     <footer>
         <p>&copy; 2026 DevTools Hub. All tools are free to use.</p>
     </footer>
-
-    <script src="js/main.js"></script>
 </body>
 </html>

@@ -3,103 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Test and debug regular expressions online with real-time matching. Supports JavaScript regex syntax with syntax highlighting.">
-    <meta name="keywords" content="regex tester, regular expression tester, regex debugger, online regex, test regex">
-    <title>Regex Tester - Free Online Regular Expression Tool</title>
+    <meta name="description" content="Test and debug regular expressions in real-time. Supports JavaScript regex with global, case-insensitive, and multiline flags. Free online tool.">
+    <meta name="keywords" content="regex tester, regular expression tester, regex debugger, online regex">
+    <title>Regex Tester - DevTools Hub</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .tool-container {
-            background: #fff;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        textarea, input[type="text"] {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
-        }
-        textarea:focus, input[type="text"]:focus {
-            outline: none;
-            border-color: #4a90d9;
-        }
-        input[type="text"] {
-            margin-bottom: 1rem;
-        }
-        .flags {
-            display: flex;
-            gap: 1rem;
-            margin: 1rem 0;
-            flex-wrap: wrap;
-        }
-        .flag-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-        .matches {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #f7fafc;
-            border-radius: 6px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .match-item {
-            padding: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
-            font-family: monospace;
-        }
-        .match-item:last-child {
-            border-bottom: none;
-        }
-        .match-highlight {
-            background: #fef3c7;
-            padding: 0 2px;
-        }
-        .nav-links { margin-bottom: 1.5rem; }
-        .nav-links a { color: #4a90d9; text-decoration: none; }
-        .nav-links a:hover { text-decoration: underline; }
+        .tool-header { margin-bottom: 2rem; }
+        .tool-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .tool-header p { color: var(--text-muted); }
+        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; font-weight: 500; margin-bottom: 1.5rem; }
+        .back-link:hover { text-decoration: underline; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+        .card-title { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+        .card-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+        textarea, input[type="text"] { width: 100%; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; background: var(--bg); color: var(--text); }
+        input[type="text"] { margin-bottom: 1rem; }
+        textarea:focus, input[type="text"]:focus { outline: none; border-color: var(--primary); }
+        textarea { resize: vertical; }
+        .flags-group { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+        .flag-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; }
+        .flag-label input { width: auto; }
+        .output-box { margin-top: 1rem; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; max-height: 300px; overflow-y: auto; }
+        .match-item { padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; }
+        .match-item:last-child { border-bottom: none; }
+        .match-highlight { background: #fef9c3; padding: 0.125rem 0.25rem; border-radius: 3px; }
     </style>
 </head>
 <body>
     <header>
-        <h1>Regex Tester</h1>
-        <p>Test Regular Expressions in Real-Time</p>
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span class="logo-text">DevTools Hub</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Tools</a>
+                <a href="index.html#about">About</a>
+            </nav>
+        </div>
     </header>
 
     <main>
-        <div class="nav-links">
-            <a href="index.html">&larr; Back to DevTools Hub</a>
+        <a href="index.html" class="back-link">&larr; Back to all tools</a>
+
+        <div class="tool-header">
+            <h1>Regex Tester</h1>
+            <p>Test regular expressions in real-time with instant match highlighting</p>
         </div>
 
-        <div class="tool-container">
-            <label><strong>Regular Expression:</strong></label>
-            <input type="text" id="regex-pattern" placeholder="Enter regex pattern (e.g., \d+-\d+-\d+)">
-            <div class="flags">
+        <div class="card">
+            <div class="card-title">Pattern</div>
+            <input type="text" id="regex-pattern" placeholder="e.g., \d+-\d+-\d+ or [a-z]+">
+            <div class="card-subtitle">JavaScript regex syntax</div>
+            <div class="flags-group">
                 <label class="flag-label"><input type="checkbox" id="flag-g" checked> Global (g)</label>
                 <label class="flag-label"><input type="checkbox" id="flag-i"> Case Insensitive (i)</label>
                 <label class="flag-label"><input type="checkbox" id="flag-m"> Multiline (m)</label>
             </div>
         </div>
 
-        <div class="tool-container">
-            <label><strong>Test String:</strong></label>
-            <textarea id="test-string" rows="6" placeholder="Enter text to test against the regex..."></textarea>
-            <div style="margin-top: 1rem;">
+        <div class="card">
+            <div class="card-title">Test String</div>
+            <textarea id="test-string" rows="6" placeholder="Enter text to test against the pattern..."></textarea>
+            <div class="btn-group" style="margin-top: 1rem;">
                 <button class="btn btn-primary" onclick="testRegex()">Test Regex</button>
                 <button class="btn btn-secondary" onclick="clearRegex()">Clear</button>
             </div>
         </div>
 
-        <div class="tool-container">
-            <label><strong>Matches:</strong></label>
-            <div id="matches" class="matches">Enter a pattern and test string, then click "Test Regex" to see matches.</div>
+        <div class="card">
+            <div class="card-title">Matches</div>
+            <div id="matches" class="output-box">Enter a pattern and test string, then click "Test Regex" to see matches.</div>
         </div>
     </main>
 
@@ -127,17 +101,18 @@
                 const regex = new RegExp(pattern, flags);
                 const matches = testString.match(regex);
 
-                if (matches) {
+                if (matches && matches.length > 0) {
                     let html = `<strong>${matches.length} match(es) found:</strong><br><br>`;
                     matches.forEach((match, i) => {
-                        html += `<div class="match-item">Match ${i + 1}: <strong>${escapeHtml(match)}</strong> (index: ${testString.indexOf(match)})</div>`;
+                        const index = testString.indexOf(match);
+                        html += `<div class="match-item">Match ${i + 1}: <span class="match-highlight">${escapeHtml(match)}</span> (index: ${index})</div>`;
                     });
                     matchesDiv.innerHTML = html;
                 } else {
                     matchesDiv.innerHTML = 'No matches found.';
                 }
             } catch (e) {
-                matchesDiv.innerHTML = `<span style="color: #e53e3e;">Invalid regex: ${escapeHtml(e.message)}</span>`;
+                matchesDiv.innerHTML = `<span style="color: #dc2626;">Invalid regex: ${escapeHtml(e.message)}</span>`;
             }
         }
 

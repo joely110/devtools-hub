@@ -3,111 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free online JSON formatter and validator. Format, minify, and validate JSON data with syntax highlighting. No signup required.">
+    <meta name="description" content="Free online JSON formatter and validator. Format, minify, and validate JSON data instantly. No signup required.">
     <meta name="keywords" content="JSON formatter, JSON validator, JSON minifier, format JSON, validate JSON, online JSON tool">
-    <title>JSON Formatter & Validator - Free Online Tool</title>
+    <title>JSON Formatter & Validator - DevTools Hub</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .tool-container {
-            background: #fff;
-            border-radius: 8px;
-            padding: 1.5rem;
+        .tool-header {
+            margin-bottom: 2rem;
+        }
+        .tool-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .tool-header p {
+            color: var(--text-muted);
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
             margin-bottom: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
         }
         textarea {
             width: 100%;
-            height: 250px;
+            height: 200px;
             padding: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+            font-size: 0.9rem;
             resize: vertical;
+            background: var(--bg);
+            color: var(--text);
         }
         textarea:focus {
             outline: none;
-            border-color: #4a90d9;
+            border-color: var(--primary);
         }
         .btn-group {
             display: flex;
-            gap: 0.75rem;
-            margin: 1rem 0;
+            gap: 0.5rem;
+            margin-top: 1rem;
             flex-wrap: wrap;
         }
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        .btn-primary {
-            background: #4a90d9;
-            color: #fff;
-        }
-        .btn-primary:hover {
-            background: #3a7bc8;
-        }
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #333;
-        }
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-        .result-box {
-            margin-top: 1rem;
+        .output-box {
             padding: 1rem;
-            border-radius: 6px;
-            font-family: monospace;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.9rem;
             white-space: pre-wrap;
             word-break: break-all;
             max-height: 400px;
             overflow-y: auto;
+            background: var(--bg);
+            border: 1px solid var(--border);
         }
-        .result-box.valid {
-            background: #f0fff4;
-            border: 1px solid #9ae6b4;
-            color: #22543d;
+        .output-box.success {
+            background: #f0fdf4;
+            border-color: #86efac;
+            color: #166534;
         }
-        .result-box.invalid {
-            background: #fff5f5;
-            border: 1px solid #feb2b2;
-            color: #742a2a;
+        .output-box.error {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #991b1b;
         }
-        .result-box.minified {
-            background: #f7fafc;
-            border: 1px solid #e2e8f0;
-            color: #2d3748;
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
-        .nav-links {
-            margin-bottom: 1.5rem;
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
         }
-        .nav-links a {
-            color: #4a90d9;
-            text-decoration: none;
-        }
-        .nav-links a:hover {
-            text-decoration: underline;
+        .badge-error {
+            background: #fee2e2;
+            color: #991b1b;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>JSON Formatter</h1>
-        <p>Format, Minify & Validate JSON Data</p>
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span class="logo-text">DevTools Hub</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Tools</a>
+                <a href="index.html#about">About</a>
+            </nav>
+        </div>
     </header>
 
     <main>
-        <div class="nav-links">
-            <a href="index.html">&larr; Back to DevTools Hub</a>
+        <a href="index.html" class="back-link">&larr; Back to all tools</a>
+
+        <div class="tool-header">
+            <h1>JSON Formatter</h1>
+            <p>Format, minify, and validate JSON data instantly</p>
         </div>
 
-        <div class="tool-container">
-            <label for="json-input"><strong>Enter JSON:</strong></label>
-            <textarea id="json-input" placeholder="Paste your JSON here..."></textarea>
+        <div class="card">
+            <div class="card-title">Input</div>
+            <textarea id="json-input" placeholder='{"name": "John", "age": 30, "city": "New York"}'></textarea>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="formatJSON()">Format</button>
                 <button class="btn btn-secondary" onclick="minifyJSON()">Minify</button>
@@ -116,11 +140,13 @@
             </div>
         </div>
 
-        <div class="tool-container">
-            <label><strong>Result:</strong></label>
-            <div id="result" class="result-box"></div>
-            <div class="btn-group" id="copy-btn-group" style="display:none;">
-                <button class="btn btn-primary" onclick="copyResult()">Copy Result</button>
+        <div class="card" id="result-card" style="display: none;">
+            <div class="card-title">
+                Output <span class="badge" id="status-badge"></span>
+            </div>
+            <div class="output-box" id="output"></div>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="copy-btn" onclick="copyResult()">Copy</button>
             </div>
         </div>
     </main>
@@ -132,84 +158,97 @@
     <script>
         function formatJSON() {
             const input = document.getElementById('json-input').value;
-            const result = document.getElementById('result');
-            const copyBtnGroup = document.getElementById('copy-btn-group');
+            const resultCard = document.getElementById('result-card');
+            const output = document.getElementById('output');
+            const badge = document.getElementById('status-badge');
 
             if (!input.trim()) {
-                result.className = 'result-box invalid';
-                result.textContent = 'Please enter some JSON first.';
+                showError('Please enter some JSON first.');
                 return;
             }
 
             try {
                 const parsed = JSON.parse(input);
                 const formatted = JSON.stringify(parsed, null, 2);
-                result.className = 'result-box valid';
-                result.textContent = formatted;
-                copyBtnGroup.style.display = 'block';
+                output.textContent = formatted;
+                output.className = 'output-box success';
+                badge.textContent = 'Valid';
+                badge.className = 'badge badge-success';
+                resultCard.style.display = 'block';
+                document.getElementById('copy-btn').style.display = 'inline-flex';
             } catch (e) {
-                result.className = 'result-box invalid';
-                result.textContent = 'Invalid JSON: ' + e.message;
-                copyBtnGroup.style.display = 'none';
+                showError('Invalid JSON: ' + e.message);
             }
         }
 
         function minifyJSON() {
             const input = document.getElementById('json-input').value;
-            const result = document.getElementById('result');
-            const copyBtnGroup = document.getElementById('copy-btn-group');
+            const resultCard = document.getElementById('result-card');
+            const output = document.getElementById('output');
+            const badge = document.getElementById('status-badge');
 
             if (!input.trim()) {
-                result.className = 'result-box invalid';
-                result.textContent = 'Please enter some JSON first.';
+                showError('Please enter some JSON first.');
                 return;
             }
 
             try {
                 const parsed = JSON.parse(input);
                 const minified = JSON.stringify(parsed);
-                result.className = 'result-box minified';
-                result.textContent = minified;
-                copyBtnGroup.style.display = 'block';
+                output.textContent = minified;
+                output.className = 'output-box';
+                badge.textContent = 'Minified';
+                badge.className = 'badge badge-success';
+                resultCard.style.display = 'block';
+                document.getElementById('copy-btn').style.display = 'inline-flex';
             } catch (e) {
-                result.className = 'result-box invalid';
-                result.textContent = 'Invalid JSON: ' + e.message;
-                copyBtnGroup.style.display = 'none';
+                showError('Invalid JSON: ' + e.message);
             }
         }
 
         function validateJSON() {
             const input = document.getElementById('json-input').value;
-            const result = document.getElementById('result');
-            const copyBtnGroup = document.getElementById('copy-btn-group');
+            const resultCard = document.getElementById('result-card');
+            const output = document.getElementById('output');
+            const badge = document.getElementById('status-badge');
 
             if (!input.trim()) {
-                result.className = 'result-box invalid';
-                result.textContent = 'Please enter some JSON first.';
+                showError('Please enter some JSON first.');
                 return;
             }
 
             try {
                 JSON.parse(input);
-                result.className = 'result-box valid';
-                result.textContent = 'Valid JSON ✓';
-                copyBtnGroup.style.display = 'none';
+                output.textContent = '✓ Valid JSON';
+                output.className = 'output-box success';
+                badge.textContent = 'Valid';
+                badge.className = 'badge badge-success';
+                resultCard.style.display = 'block';
+                document.getElementById('copy-btn').style.display = 'none';
             } catch (e) {
-                result.className = 'result-box invalid';
-                result.textContent = 'Invalid JSON: ' + e.message;
-                copyBtnGroup.style.display = 'none';
+                showError('Invalid JSON: ' + e.message);
             }
+        }
+
+        function showError(message) {
+            const resultCard = document.getElementById('result-card');
+            const output = document.getElementById('output');
+            const badge = document.getElementById('status-badge');
+            output.textContent = message;
+            output.className = 'output-box error';
+            badge.textContent = 'Error';
+            badge.className = 'badge badge-error';
+            resultCard.style.display = 'block';
         }
 
         function clearJSON() {
             document.getElementById('json-input').value = '';
-            document.getElementById('result').textContent = '';
-            document.getElementById('copy-btn-group').style.display = 'none';
+            document.getElementById('result-card').style.display = 'none';
         }
 
         function copyResult() {
-            const result = document.getElementById('result').textContent;
-            navigator.clipboard.writeText(result).then(() => {
+            const text = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(text).then(() => {
                 alert('Copied to clipboard!');
             });
         }
