@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert colors between HEX, RGB, and HSL formats instantly. Free online color converter tool for designers and developers.">
+    <meta name="keywords" content="color converter, HEX to RGB, RGB to HSL, color format converter, online color tool">
+    <title>Color Converter - HEX, RGB, HSL Converter</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tool-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .color-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .color-input-group label {
+            flex: 1;
+            min-width: 200px;
+        }
+        .color-input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+        .color-input-group input:focus {
+            outline: none;
+            border-color: #4a90d9;
+        }
+        .color-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid #ddd;
+        }
+        .result-values {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .result-item {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+        .result-item label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .result-item code {
+            font-size: 1.1rem;
+            color: #2d3748;
+            background: #fff;
+            padding: 0.5rem;
+            border-radius: 4px;
+            display: block;
+        }
+        .nav-links { margin-bottom: 1.5rem; }
+        .nav-links a { color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Color Converter</h1>
+        <p>Convert Between HEX, RGB & HSL Color Formats</p>
+    </header>
+
+    <main>
+        <div class="nav-links">
+            <a href="index.html">&larr; Back to DevTools Hub</a>
+        </div>
+
+        <div class="tool-container">
+            <label><strong>Pick a Color:</strong></label>
+            <input type="color" id="color-picker" value="#4a90d9" onchange="convertFromPicker()">
+            <div class="color-preview" id="color-preview" style="background: #4a90d9;"></div>
+        </div>
+
+        <div class="tool-container">
+            <div class="color-input-group">
+                <label>
+                    HEX
+                    <input type="text" id="hex-input" placeholder="#4a90d9" value="#4a90d9" oninput="convertFromHex()">
+                </label>
+                <label>
+                    RGB
+                    <input type="text" id="rgb-input" placeholder="rgb(74, 144, 217)" oninput="convertFromRgb()">
+                </label>
+                <label>
+                    HSL
+                    <input type="text" id="hsl-input" placeholder="hsl(207, 65%, 57%)" oninput="convertFromHsl()">
+                </label>
+            </div>
+            <button class="btn btn-secondary" onclick="clearColor()">Clear</button>
+        </div>
+
+        <div class="tool-container" id="result-section" style="display:none;">
+            <label><strong>All Formats:</strong></label>
+            <div class="result-values">
+                <div class="result-item">
+                    <label>HEX</label>
+                    <code id="result-hex">#4a90d9</code>
+                </div>
+                <div class="result-item">
+                    <label>RGB</label>
+                    <code id="result-rgb">rgb(74, 144, 217)</code>
+                </div>
+                <div class="result-item">
+                    <label>HSL</label>
+                    <code id="result-hsl">hsl(207, 65%, 57%)</code>
+                </div>
+                <div class="result-item">
+                    <label>RGBA</label>
+                    <code id="result-rgba">rgba(74, 144, 217, 1)</code>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 DevTools Hub. All tools are free to use.</p>
+    </footer>
+
+    <script>
+        let isUpdating = false;
+
+        function convertFromPicker() {
+            if (isUpdating) return;
+            isUpdating = true;
+            const hex = document.getElementById('color-picker').value;
+            document.getElementById('hex-input').value = hex;
+            updateAllFormats(hex);
+            isUpdating = false;
+        }
+
+        function convertFromHex() {
+            if (isUpdating) return;
+            isUpdating = true;
+            let hex = document.getElementById('hex-input').value.trim();
+            if (!hex.startsWith('#')) hex = '#' + hex;
+            if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+                document.getElementById('color-picker').value = hex;
+                updateAllFormats(hex);
+            }
+            isUpdating = false;
+        }
+
+        function convertFromRgb() {
+            if (isUpdating) return;
+            isUpdating = true;
+            const rgbText = document.getElementById('rgb-input').value;
+            const match = rgbText.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+            if (match) {
+                const r = parseInt(match[1]);
+                const g = parseInt(match[2]);
+                const b = parseInt(match[3]);
+                if (r <= 255 && g <= 255 && b <= 255) {
+                    const hex = rgbToHex(r, g, b);
+                    document.getElementById('hex-input').value = hex;
+                    document.getElementById('color-picker').value = hex;
+                    updateAllFormats(hex);
+                }
+            }
+            isUpdating = false;
+        }
+
+        function convertFromHsl() {
+            if (isUpdating) return;
+            isUpdating = true;
+            const hslText = document.getElementById('hsl-input').value;
+            const match = hslText.match(/hsl\s*\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*\)/i);
+            if (match) {
+                const h = parseInt(match[1]);
+                const s = parseInt(match[2]);
+                const l = parseInt(match[3]);
+                const rgb = hslToRgb(h, s, l);
+                const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                document.getElementById('hex-input').value = hex;
+                document.getElementById('color-picker').value = hex;
+                updateAllFormats(hex);
+            }
+            isUpdating = false;
+        }
+
+        function updateAllFormats(hex) {
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+            document.getElementById('color-preview').style.background = hex;
+            document.getElementById('rgb-input').value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            document.getElementById('hsl-input').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            document.getElementById('result-hex').textContent = hex.toUpperCase();
+            document.getElementById('result-rgb').textContent = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            document.getElementById('result-hsl').textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            document.getElementById('result-rgba').textContent = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
+            document.getElementById('result-section').style.display = 'block';
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        }
+
+        function clearColor() {
+            document.getElementById('hex-input').value = '';
+            document.getElementById('rgb-input').value = '';
+            document.getElementById('hsl-input').value = '';
+            document.getElementById('result-section').style.display = 'none';
+        }
+
+        // Initialize
+        convertFromHex();
+    </script>
+</body>
+</html>

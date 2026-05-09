@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate UUID v4 strings instantly and for free. Copy generated UUIDs with one click. No signup required.">
+    <meta name="keywords" content="UUID generator, UUID v4, generate UUID, random UUID generator, online UUID">
+    <title>UUID v4 Generator - Free Online Tool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tool-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .uuid-display {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 1.5rem;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            letter-spacing: 2px;
+        }
+        .uuid-list {
+            text-align: left;
+            margin-top: 2rem;
+        }
+        .uuid-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-family: monospace;
+        }
+        .nav-links { margin-bottom: 1.5rem; }
+        .nav-links a { color: #4a90d9; text-decoration: none; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UUID Generator</h1>
+        <p>Generate UUID v4 Strings Instantly</p>
+    </header>
+
+    <main>
+        <div class="nav-links">
+            <a href="index.html">&larr; Back to DevTools Hub</a>
+        </div>
+
+        <div class="tool-container">
+            <h2>Generate Single UUID</h2>
+            <div class="uuid-display" id="single-uuid">Click generate to create a UUID</div>
+            <button class="btn btn-primary" onclick="generateSingleUUID()">Generate UUID</button>
+            <button class="btn btn-secondary" onclick="copySingleUUID()">Copy</button>
+        </div>
+
+        <div class="tool-container">
+            <h2>Batch Generate</h2>
+            <p style="margin-bottom: 1rem;">Generate multiple UUIDs at once:</p>
+            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <label>Count: <input type="number" id="batch-count" value="10" min="1" max="100" style="width: 80px; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px;"></label>
+                <button class="btn btn-primary" onclick="generateBatchUUID()">Generate Batch</button>
+                <button class="btn btn-secondary" onclick="copyAllUUID()">Copy All</button>
+            </div>
+            <div class="uuid-list" id="uuid-list"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 DevTools Hub. All tools are free to use.</p>
+    </footer>
+
+    <script>
+        function generateUUIDv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function generateSingleUUID() {
+            const uuid = generateUUIDv4();
+            document.getElementById('single-uuid').textContent = uuid;
+        }
+
+        function copySingleUUID() {
+            const uuid = document.getElementById('single-uuid').textContent;
+            if (uuid && !uuid.includes('Click generate')) {
+                navigator.clipboard.writeText(uuid).then(() => {
+                    alert('UUID copied to clipboard!');
+                });
+            }
+        }
+
+        function generateBatchUUID() {
+            const count = parseInt(document.getElementById('batch-count').value) || 10;
+            const list = document.getElementById('uuid-list');
+            list.innerHTML = '';
+
+            for (let i = 0; i < Math.min(count, 100); i++) {
+                const uuid = generateUUIDv4();
+                const item = document.createElement('div');
+                item.className = 'uuid-item';
+                item.innerHTML = `<span>${uuid}</span><button class="btn btn-secondary" onclick="copyUUID('${uuid}')">Copy</button>`;
+                list.appendChild(item);
+            }
+        }
+
+        function copyUUID(uuid) {
+            navigator.clipboard.writeText(uuid).then(() => {
+                alert('UUID copied!');
+            });
+        }
+
+        function copyAllUUID() {
+            const items = document.querySelectorAll('.uuid-item span');
+            if (items.length === 0) {
+                alert('Generate some UUIDs first!');
+                return;
+            }
+            const allUUIDs = Array.from(items).map(el => el.textContent).join('\n');
+            navigator.clipboard.writeText(allUUIDs).then(() => {
+                alert('All UUIDs copied to clipboard!');
+            });
+        }
+
+        // Generate one on load
+        generateSingleUUID();
+    </script>
+</body>
+</html>
