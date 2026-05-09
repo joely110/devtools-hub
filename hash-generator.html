@@ -4,25 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Generate MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes instantly. Free online hash generator. No signup required.">
-    <meta name="keywords" content="hash generator, MD5, SHA-1, SHA-256, SHA-512, online hash generator">
+    <meta name="keywords" content="hash generator, MD5, SHA-1, SHA-256, SHA-512">
     <title>Hash Generator - DevTools Hub</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .tool-header { margin-bottom: 2rem; }
-        .tool-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .tool-header p { color: var(--text-muted); }
-        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; font-weight: 500; margin-bottom: 1.5rem; }
-        .back-link:hover { text-decoration: underline; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
-        .card-title { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
-        textarea { width: 100%; height: 120px; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; resize: vertical; background: var(--bg); color: var(--text); }
-        textarea:focus { outline: none; border-color: var(--primary); }
-        .btn-group { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
-        .hash-result { margin-top: 1rem; }
-        .hash-result label { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.25rem; }
-        .hash-result code { display: block; font-family: 'SF Mono', Monaco, monospace; font-size: 0.85rem; word-break: break-all; background: var(--bg); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border); }
-        .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #dcfce7; color: #166534; }
-    </style>
 </head>
 <body>
     <header>
@@ -31,15 +15,23 @@
                 <div class="logo-icon">{ }</div>
                 <span class="logo-text">DevTools Hub</span>
             </a>
-            <nav class="nav-links">
-                <a href="index.html">Tools</a>
-                <a href="index.html#about">About</a>
-            </nav>
+            <div class="header-right">
+                <nav class="nav-links">
+                    <a href="index.html">Tools</a>
+                    <a href="index.html#about">About</a>
+                </nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
         </div>
     </header>
 
     <main>
-        <a href="index.html" class="back-link">&larr; Back to all tools</a>
+        <a href="index.html" class="back-link">← Back to all tools</a>
 
         <div class="tool-header">
             <h1>Hash Generator</h1>
@@ -56,7 +48,7 @@
         </div>
 
         <div class="card" id="results" style="display: none;">
-            <div class="card-title">Output <span class="badge">Generated</span></div>
+            <div class="card-title">Output <span class="badge badge-success">Generated</span></div>
             <div class="hash-result">
                 <label>MD5</label>
                 <code id="md5-result"></code>
@@ -88,6 +80,16 @@
     </footer>
 
     <script>
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+            });
+            localStorage.setItem('theme', theme);
+        }
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
         function md5(text) {
             function md5cycle(x, k) {
                 let a = x[0], b = x[1], c = x[2], d = x[3];
@@ -168,10 +170,7 @@
             document.getElementById('results').style.display = 'block';
         }
 
-        function clearHash() {
-            document.getElementById('text-input').value = '';
-            document.getElementById('results').style.display = 'none';
-        }
+        function clearHash() { document.getElementById('text-input').value = ''; document.getElementById('results').style.display = 'none'; }
 
         function copyAllHashes() {
             const text = `MD5: ${document.getElementById('md5-result').textContent}\nSHA-1: ${document.getElementById('sha1-result').textContent}\nSHA-256: ${document.getElementById('sha256-result').textContent}\nSHA-384: ${document.getElementById('sha384-result').textContent}\nSHA-512: ${document.getElementById('sha512-result').textContent}`;

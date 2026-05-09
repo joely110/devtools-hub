@@ -3,107 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Generate UUID v4 strings instantly. Free online UUID generator. No signup required.">
-    <meta name="keywords" content="UUID generator, UUID v4, generate UUID, random UUID">
+    <meta name="description" content="Generate UUID v4 strings instantly. Free online UUID generator.">
+    <meta name="keywords" content="UUID generator, UUID v4, generate UUID">
     <title>UUID Generator - DevTools Hub</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .tool-header { margin-bottom: 2rem; }
-        .tool-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .tool-header p { color: var(--text-muted); }
-        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; font-weight: 500; margin-bottom: 1.5rem; }
-        .back-link:hover { text-decoration: underline; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
-        .card-title { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
-        .uuid-display { font-family: 'SF Mono', Monaco, monospace; font-size: 1.3rem; padding: 1.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; text-align: center; letter-spacing: 1px; margin: 1rem 0; }
-        .batch-list { margin-top: 1.5rem; }
-        .uuid-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-family: 'SF Mono', Monaco, monospace; }
-        .uuid-item:last-child { border-bottom: none; }
-    </style>
 </head>
 <body>
     <header>
         <div class="header-content">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">{ }</div>
-                <span class="logo-text">DevTools Hub</span>
-            </a>
-            <nav class="nav-links">
-                <a href="index.html">Tools</a>
-                <a href="index.html#about">About</a>
-            </nav>
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
         </div>
     </header>
-
     <main>
-        <a href="index.html" class="back-link">&larr; Back to all tools</a>
-
-        <div class="tool-header">
-            <h1>UUID Generator</h1>
-            <p>Generate UUID v4 strings instantly</p>
-        </div>
-
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>UUID Generator</h1><p>Generate UUID v4 strings instantly</p></div>
         <div class="card">
             <div class="card-title">Single UUID</div>
             <div class="uuid-display" id="single-uuid">Click Generate</div>
-            <div style="display: flex; gap: 0.5rem;">
+            <div style="display:flex;gap:0.5rem;margin-top:1rem;">
                 <button class="btn btn-primary" onclick="generateSingleUUID()">Generate</button>
                 <button class="btn btn-secondary" onclick="copySingleUUID()">Copy</button>
             </div>
         </div>
-
         <div class="card">
             <div class="card-title">Batch Generate</div>
-            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
-                <label style="display: flex; align-items: center; gap: 0.5rem;">
-                    Count:
-                    <input type="number" id="batch-count" value="10" min="1" max="100" style="width: 80px; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px;">
-                </label>
+            <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:0.5rem;">Count:<input type="number" id="batch-count" value="10" min="1" max="100" style="width:80px;padding:0.5rem;border:1px solid var(--border);border-radius:6px;"></label>
                 <button class="btn btn-primary" onclick="generateBatchUUID()">Generate Batch</button>
                 <button class="btn btn-secondary" onclick="copyAllUUID()">Copy All</button>
             </div>
-            <div class="batch-list" id="uuid-list"></div>
+            <div id="uuid-list"></div>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2026 DevTools Hub. All tools are free to use.</p>
-    </footer>
-
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
     <script>
-        function generateUUIDv4() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
 
-        function generateSingleUUID() {
-            document.getElementById('single-uuid').textContent = generateUUIDv4();
-        }
-
-        function copySingleUUID() {
-            const uuid = document.getElementById('single-uuid').textContent;
-            if (!uuid.includes('Click')) navigator.clipboard.writeText(uuid).then(() => alert('UUID copied!'));
-        }
-
+        function generateUUIDv4() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) { const r = Math.random() * 16 | 0; const v = c === 'x' ? r : (r & 0x3 | 0x8); return v.toString(16); }); }
+        function generateSingleUUID() { document.getElementById('single-uuid').textContent = generateUUIDv4(); }
+        function copySingleUUID() { const uuid = document.getElementById('single-uuid').textContent; if (!uuid.includes('Click')) navigator.clipboard.writeText(uuid).then(() => alert('UUID copied!')); }
         function generateBatchUUID() {
             const count = Math.min(parseInt(document.getElementById('batch-count').value) || 10, 100);
             const list = document.getElementById('uuid-list');
             list.innerHTML = '';
             for (let i = 0; i < count; i++) {
                 const uuid = generateUUIDv4();
-                list.innerHTML += `<div class="uuid-item"><span>${uuid}</span><button class="btn btn-secondary" onclick="navigator.clipboard.writeText('${uuid}').then(()=>alert('Copied!'))">Copy</button></div>`;
+                list.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid var(--border);font-family:'SF Mono',Monaco,monospace;"><span>${uuid}</span><button class="btn btn-secondary" onclick="navigator.clipboard.writeText('${uuid}').then(()=>alert('Copied!'))">Copy</button></div>`;
             }
         }
-
-        function copyAllUUID() {
-            const items = document.querySelectorAll('.uuid-item span');
-            if (items.length === 0) { alert('Generate some UUIDs first!'); return; }
-            navigator.clipboard.writeText(Array.from(items).map(el => el.textContent).join('\n')).then(() => alert('All UUIDs copied!'));
-        }
-
+        function copyAllUUID() { const items = document.querySelectorAll('#uuid-list div span'); if (items.length === 0) { alert('Generate some UUIDs first!'); return; } navigator.clipboard.writeText(Array.from(items).map(el => el.textContent).join('\n')).then(() => alert('All UUIDs copied!')); }
         generateSingleUUID();
     </script>
 </body>

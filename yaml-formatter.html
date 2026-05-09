@@ -7,21 +7,6 @@
     <meta name="keywords" content="yaml formatter, yaml validator, yaml to json, yaml parser">
     <title>YAML Formatter - DevTools Hub</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .tool-header { margin-bottom: 2rem; }
-        .tool-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .tool-header p { color: var(--text-muted); }
-        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; font-weight: 500; margin-bottom: 1.5rem; }
-        .back-link:hover { text-decoration: underline; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
-        .card-title { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
-        textarea { width: 100%; height: 200px; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; resize: vertical; background: var(--bg); color: var(--text); }
-        textarea:focus { outline: none; border-color: var(--primary); }
-        .btn-group { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
-        .output-box { margin-top: 1rem; padding: 1rem; border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); }
-        .output-box.success { background: #f0fdf4; border-color: #86efac; }
-        .output-box.error { background: #fef2f2; border-color: #fca5a5; }
-    </style>
 </head>
 <body>
     <header>
@@ -30,15 +15,23 @@
                 <div class="logo-icon">{ }</div>
                 <span class="logo-text">DevTools Hub</span>
             </a>
-            <nav class="nav-links">
-                <a href="index.html">Tools</a>
-                <a href="index.html#about">About</a>
-            </nav>
+            <div class="header-right">
+                <nav class="nav-links">
+                    <a href="index.html">Tools</a>
+                    <a href="index.html#about">About</a>
+                </nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
         </div>
     </header>
 
     <main>
-        <a href="index.html" class="back-link">&larr; Back to all tools</a>
+        <a href="index.html" class="back-link">← Back to all tools</a>
 
         <div class="tool-header">
             <h1>YAML Formatter</h1>
@@ -73,6 +66,16 @@ city: New York"></textarea>
     </footer>
 
     <script>
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+            });
+            localStorage.setItem('theme', theme);
+        }
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
         function parseYAML(yaml) {
             const lines = yaml.split('\n');
             const result = {};
@@ -147,9 +150,7 @@ city: New York"></textarea>
                 output.textContent = toYAML(parsed).trim();
                 output.className = 'output-box success';
                 resultCard.style.display = 'block';
-            } catch (e) {
-                showError('Invalid YAML: ' + e.message);
-            }
+            } catch (e) { showError('Invalid YAML: ' + e.message); }
         }
 
         function minifyYAML() {
@@ -162,9 +163,7 @@ city: New York"></textarea>
                 output.textContent = JSON.stringify(parsed);
                 output.className = 'output-box';
                 resultCard.style.display = 'block';
-            } catch (e) {
-                showError('Invalid YAML: ' + e.message);
-            }
+            } catch (e) { showError('Invalid YAML: ' + e.message); }
         }
 
         function validateYAML() {
@@ -177,9 +176,7 @@ city: New York"></textarea>
                 output.textContent = '✓ Valid YAML';
                 output.className = 'output-box success';
                 resultCard.style.display = 'block';
-            } catch (e) {
-                showError('Invalid YAML: ' + e.message);
-            }
+            } catch (e) { showError('Invalid YAML: ' + e.message); }
         }
 
         function yamlToJSON() {
@@ -192,9 +189,7 @@ city: New York"></textarea>
                 output.textContent = JSON.stringify(parsed, null, 2);
                 output.className = 'output-box';
                 resultCard.style.display = 'block';
-            } catch (e) {
-                showError('Invalid YAML: ' + e.message);
-            }
+            } catch (e) { showError('Invalid YAML: ' + e.message); }
         }
 
         function showError(message) {
@@ -205,14 +200,8 @@ city: New York"></textarea>
             resultCard.style.display = 'block';
         }
 
-        function clearYAML() {
-            document.getElementById('yaml-input').value = '';
-            document.getElementById('result-card').style.display = 'none';
-        }
-
-        function copyResult() {
-            navigator.clipboard.writeText(document.getElementById('output').textContent).then(() => alert('Copied!'));
-        }
+        function clearYAML() { document.getElementById('yaml-input').value = ''; document.getElementById('result-card').style.display = 'none'; }
+        function copyResult() { navigator.clipboard.writeText(document.getElementById('output').textContent).then(() => alert('Copied!')); }
     </script>
 </body>
 </html>

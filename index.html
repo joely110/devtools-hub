@@ -15,10 +15,18 @@
                 <div class="logo-icon">{ }</div>
                 <span class="logo-text">DevTools Hub</span>
             </a>
-            <nav class="nav-links">
-                <a href="index.html">Tools</a>
-                <a href="#about">About</a>
-            </nav>
+            <div class="header-right">
+                <nav class="nav-links">
+                    <a href="index.html">Tools</a>
+                    <a href="#about">About</a>
+                </nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn active" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -41,7 +49,7 @@
                 <p>MD5, SHA-1, SHA-256, SHA-512 hashes</p>
             </a>
             <a href="yaml-formatter.html" class="tool-card">
-                <div class="tool-icon">Y</div>
+                <div class="tool-icon">YML</div>
                 <h3>YAML Formatter</h3>
                 <p>Format, validate, convert YAML to JSON</p>
             </a>
@@ -56,12 +64,12 @@
                 <p>Decode and inspect JSON Web Tokens</p>
             </a>
             <a href="crontab-generator.html" class="tool-card">
-                <div class="tool-icon">C</div>
+                <div class="tool-icon">cron</div>
                 <h3>Crontab Generator</h3>
                 <p>Build cron schedule expressions</p>
             </a>
             <a href="color-converter.html" class="tool-card">
-                <div class="tool-icon">#</div>
+                <div class="tool-icon" style="font-size:1.5rem;">🎨</div>
                 <h3>Color Converter</h3>
                 <p>Convert HEX, RGB, HSL colors</p>
             </a>
@@ -71,12 +79,12 @@
                 <p>Encode and decode Base64 strings</p>
             </a>
             <a href="url-encoder.html" class="tool-card">
-                <div class="tool-icon">&</div>
+                <div class="tool-icon">%20</div>
                 <h3>URL Encoder</h3>
                 <p>Encode or decode URL strings</p>
             </a>
             <a href="uuid-generator.html" class="tool-card">
-                <div class="tool-icon">U</div>
+                <div class="tool-icon">ID</div>
                 <h3>UUID Generator</h3>
                 <p>Generate UUID v4 strings instantly</p>
             </a>
@@ -89,17 +97,17 @@
 
         <section class="features" id="about">
             <div class="feature">
-                <div class="feature-icon">&#128274;</div>
+                <div class="feature-icon">🔒</div>
                 <h3>100% Private</h3>
                 <p>All processing happens in your browser. No data is ever sent to our servers.</p>
             </div>
             <div class="feature">
-                <div class="feature-icon">&#9889;</div>
+                <div class="feature-icon">⚡</div>
                 <h3>Instant Results</h3>
                 <p>No waiting, no loading. Get your results immediately.</p>
             </div>
             <div class="feature">
-                <div class="feature-icon">&#36;</div>
+                <div class="feature-icon">$</div>
                 <h3>Completely Free</h3>
                 <p>No signup required, no premium features. Free forever.</p>
             </div>
@@ -109,5 +117,19 @@
     <footer>
         <p>&copy; 2026 DevTools Hub. All tools are free to use.</p>
     </footer>
+
+    <script>
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+            });
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+    </script>
 </body>
 </html>

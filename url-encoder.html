@@ -3,46 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Safely encode or decode URL strings online. Free URL encoder/decoder tool. No signup required.">
+    <meta name="description" content="Safely encode or decode URL strings online. Free URL encoder/decoder tool.">
     <meta name="keywords" content="URL encoder, URL decoder, encode URL, decode URL">
     <title>URL Encoder/Decoder - DevTools Hub</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .tool-header { margin-bottom: 2rem; }
-        .tool-header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .tool-header p { color: var(--text-muted); }
-        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--primary); text-decoration: none; font-weight: 500; margin-bottom: 1.5rem; }
-        .back-link:hover { text-decoration: underline; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
-        .card-title { font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
-        textarea { width: 100%; height: 120px; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; resize: vertical; background: var(--bg); color: var(--text); }
-        textarea:focus { outline: none; border-color: var(--primary); }
-        .btn-group { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
-        .output-box { margin-top: 1rem; padding: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-family: 'SF Mono', Monaco, monospace; font-size: 0.9rem; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; }
-    </style>
 </head>
 <body>
     <header>
         <div class="header-content">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">{ }</div>
-                <span class="logo-text">DevTools Hub</span>
-            </a>
-            <nav class="nav-links">
-                <a href="index.html">Tools</a>
-                <a href="index.html#about">About</a>
-            </nav>
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
         </div>
     </header>
-
     <main>
-        <a href="index.html" class="back-link">&larr; Back to all tools</a>
-
-        <div class="tool-header">
-            <h1>URL Encoder/Decoder</h1>
-            <p>Safely encode or decode URL strings</p>
-        </div>
-
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>URL Encoder/Decoder</h1><p>Safely encode or decode URL strings</p></div>
         <div class="card">
             <div class="card-title">Input</div>
             <textarea id="url-input" placeholder="Enter URL or text to encode/decode..."></textarea>
@@ -52,55 +35,20 @@
                 <button class="btn btn-secondary" onclick="clearURL()">Clear</button>
             </div>
         </div>
-
-        <div class="card" id="result-card" style="display: none;">
+        <div class="card" id="result-card" style="display:none;">
             <div class="card-title">Output</div>
             <div class="output-box" id="result"></div>
-            <div class="btn-group">
-                <button class="btn btn-primary" id="copy-btn" onclick="copyResult()">Copy</button>
-            </div>
+            <div class="btn-group"><button class="btn btn-primary" id="copy-btn" onclick="copyResult()">Copy</button></div>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2026 DevTools Hub. All tools are free to use.</p>
-    </footer>
-
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
     <script>
-        function encodeURL() {
-            const input = document.getElementById('url-input').value;
-            const result = document.getElementById('result');
-            const resultCard = document.getElementById('result-card');
-            const copyBtn = document.getElementById('copy-btn');
-            if (!input) { result.textContent = 'Please enter a URL first.'; resultCard.style.display = 'block'; return; }
-            try {
-                result.textContent = encodeURIComponent(input);
-                copyBtn.style.display = 'inline-flex';
-            } catch (e) { result.textContent = 'Error: ' + e.message; }
-            resultCard.style.display = 'block';
-        }
-
-        function decodeURL() {
-            const input = document.getElementById('url-input').value;
-            const result = document.getElementById('result');
-            const resultCard = document.getElementById('result-card');
-            const copyBtn = document.getElementById('copy-btn');
-            if (!input) { result.textContent = 'Please enter a URL first.'; resultCard.style.display = 'block'; return; }
-            try {
-                result.textContent = decodeURIComponent(input);
-                copyBtn.style.display = 'inline-flex';
-            } catch (e) { result.textContent = 'Error: Invalid encoded URL - ' + e.message; }
-            resultCard.style.display = 'block';
-        }
-
-        function clearURL() {
-            document.getElementById('url-input').value = '';
-            document.getElementById('result-card').style.display = 'none';
-        }
-
-        function copyResult() {
-            navigator.clipboard.writeText(document.getElementById('result').textContent).then(() => alert('Copied to clipboard!'));
-        }
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+        function encodeURL() { const input = document.getElementById('url-input').value; const result = document.getElementById('result'); const resultCard = document.getElementById('result-card'); if (!input) { result.textContent = 'Please enter a URL first.'; resultCard.style.display = 'block'; return; } try { result.textContent = encodeURIComponent(input); document.getElementById('copy-btn').style.display = 'inline-flex'; } catch (e) { result.textContent = 'Error: ' + e.message; } resultCard.style.display = 'block'; }
+        function decodeURL() { const input = document.getElementById('url-input').value; const result = document.getElementById('result'); const resultCard = document.getElementById('result-card'); if (!input) { result.textContent = 'Please enter a URL first.'; resultCard.style.display = 'block'; return; } try { result.textContent = decodeURIComponent(input); document.getElementById('copy-btn').style.display = 'inline-flex'; } catch (e) { result.textContent = 'Error: Invalid encoded URL - ' + e.message; } resultCard.style.display = 'block'; }
+        function clearURL() { document.getElementById('url-input').value = ''; document.getElementById('result-card').style.display = 'none'; }
+        function copyResult() { navigator.clipboard.writeText(document.getElementById('result').textContent).then(() => alert('Copied to clipboard!')); }
     </script>
 </body>
 </html>
