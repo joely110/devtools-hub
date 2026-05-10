@@ -7,6 +7,9 @@
     <meta name="keywords" content="qr code generator, generate qr code, qr code, qr generator, create qr">
     <title>QR Code Generator - DevTools Hub</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        #qr-canvas { border: 1px solid var(--border); border-radius: 8px; }
+    </style>
 </head>
 <body>
     <header>
@@ -46,36 +49,144 @@
         </div>
     </main>
     <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script>
         function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
         setTheme(localStorage.getItem('theme') || 'light');
 
-        function generateQR() {
-            const input = document.getElementById('qr-input').value;
-            if (!input.trim()) { alert('Please enter content first.'); return; }
+        // Simple QR Code Generator
+        function generateQRMatrix(data) {
+            var size = 21;
+            var m = [];
+            for (var i = 0; i < size; i++) {
+                m[i] = [];
+                for (var j = 0; j < size; j++) {
+                    m[i][j] = 0;
+                }
+            }
 
-            const canvas = document.getElementById('qr-canvas');
-            QRCode.toCanvas(canvas, input, {
-                width: 256,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#ffffff'
+            // Finder patterns
+            function putFinder(row, col) {
+                for (var r = 0; r < 7; r++) {
+                    for (var c = 0; c < 7; c++) {
+                        if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+                            m[row + r][col + c] = 1;
+                        }
+                    }
                 }
-            }, (error) => {
-                if (error) {
-                    alert('Error generating QR code: ' + error.message);
-                } else {
-                    document.getElementById('result-card').style.display = 'block';
+            }
+
+            putFinder(0, 0);
+            putFinder(0, size - 7);
+            putFinder(size - 7, 0);
+
+            // Timing patterns
+            for (var i = 8; i <= 12; i++) {
+                m[6][i] = i % 2 === 0 ? 1 : 0;
+                m[i][6] = i % 2 === 0 ? 1 : 0;
+            }
+
+            // Alignment pattern (center)
+            var c = 10;
+            for (var r = c - 2; r <= c + 2; r++) {
+                for (var cc = c - 2; cc <= c + 2; cc++) {
+                    if (Math.abs(r - c) === 2 || Math.abs(cc - c) === 2 || (r >= c - 1 && r <= c + 1 && cc >= c - 1 && cc <= c + 1)) {
+                        m[r][cc] = 1;
+                    }
                 }
-            });
+            }
+
+            // Data encoding
+            var bits = [];
+            // Mode byte (0100 = byte mode)
+            bits.push(0, 1, 0, 0);
+            // Length
+            var len = data.length;
+            for (var i = 7; i >= 0; i--) {
+                bits.push((len >> i) & 1);
+            }
+            // Data bytes
+            for (var i = 0; i < data.length; i++) {
+                var code = data.charCodeAt(i);
+                for (var j = 7; j >= 0; j--) {
+                    bits.push((code >> j) & 1);
+                }
+            }
+            // Terminator
+            for (var i = 0; i < 4 && bits.length < 152; i++) bits.push(0);
+            // Pad to byte boundary
+            while (bits.length % 8 !== 0) bits.push(0);
+            // Pad bytes
+            var pads = [236, 17];
+            var pi = 0;
+            while (bits.length < 152) {
+                for (var j = 7; j >= 0; j--) bits.push((pads[pi % 2] >> j) & 1);
+                pi++;
+            }
+
+            // Place bits in zigzag pattern
+            var bitIdx = 0;
+            var upward = true;
+            for (var col = size - 2; col > 0; col -= 2) {
+                if (col === 6) col = 5;
+                for (var row = upward ? size - 1 : 0; upward ? row >= 0 : row < size; row += upward ? -1 : 1) {
+                    for (var i = 0; i < 2; i++) {
+                        var cc = col - i;
+                        if (m[row][cc] === 0 && bitIdx < bits.length) {
+                            m[row][cc] = bits[bitIdx++];
+                        }
+                    }
+                }
+                upward = !upward;
+            }
+
+            return m;
+        }
+
+        function drawQR(data, canvas, options) {
+            var size = options && options.width ? options.width : 256;
+            var margin = 4;
+            var dark = '#000000';
+            var light = '#ffffff';
+
+            var matrix = generateQRMatrix(data);
+            var matrixSize = matrix.length;
+            var cellSize = Math.floor((size - margin * 2) / matrixSize);
+            var actualSize = cellSize * matrixSize + margin * 2;
+
+            canvas.width = actualSize;
+            canvas.height = actualSize;
+            var ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = light;
+            ctx.fillRect(0, 0, actualSize, actualSize);
+
+            ctx.fillStyle = dark;
+            for (var row = 0; row < matrixSize; row++) {
+                for (var col = 0; col < matrixSize; col++) {
+                    if (matrix[row][col]) {
+                        var x = margin + col * cellSize;
+                        var y = margin + row * cellSize;
+                        ctx.fillRect(x, y, cellSize, cellSize);
+                    }
+                }
+            }
+        }
+
+        function generateQR() {
+            var input = document.getElementById('qr-input').value;
+            if (!input.trim()) {
+                alert('Please enter content first.');
+                return;
+            }
+            var canvas = document.getElementById('qr-canvas');
+            drawQR(input, canvas, { width: 256 });
+            document.getElementById('result-card').style.display = 'block';
         }
 
         function downloadQR() {
-            const canvas = document.getElementById('qr-canvas');
-            const url = canvas.toDataURL('image/png');
-            const a = document.createElement('a');
+            var canvas = document.getElementById('qr-canvas');
+            var url = canvas.toDataURL('image/png');
+            var a = document.createElement('a');
             a.href = url;
             a.download = 'qrcode.png';
             a.click();
