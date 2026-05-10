@@ -36,15 +36,13 @@
         }
         .search-input {
             width: 100%;
-            padding: 1rem 1rem 1rem 2.75rem;
+            padding: 1rem 1rem 1rem 2.5rem;
             font-size: 1.1rem;
             border: 2px solid var(--border);
             border-radius: 12px;
             background: var(--card-bg);
             color: var(--text);
             transition: all 0.2s;
-            position: relative;
-            z-index: 2;
         }
         .search-input:focus {
             border-color: var(--primary);
@@ -53,13 +51,37 @@
         }
         .search-icon {
             position: absolute;
-            left: 0.85rem;
+            left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.2rem;
+            width: 20px;
+            height: 20px;
             color: var(--text-muted);
-            z-index: 3;
+            z-index: 1;
             pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-icon::before {
+            content: "";
+            display: block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            position: relative;
+        }
+        .search-icon::after {
+            content: "";
+            display: block;
+            width: 2px;
+            height: 8px;
+            background: currentColor;
+            position: absolute;
+            right: 2px;
+            bottom: 0px;
+            transform: rotate(45deg);
         }
         .category-filters {
             display: flex;
@@ -211,7 +233,7 @@
         </div>
 
         <div class="search-container">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon"></span>
             <input type="text" id="search-input" class="search-input" placeholder="Search tools by name or description..." autocomplete="off">
         </div>
 
