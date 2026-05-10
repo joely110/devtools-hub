@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact Us - DevTools Hub">
+    <title>Contact Us - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span class="logo-text">DevTools Hub</span>
+            </a>
+            <div class="header-right">
+                <nav class="nav-links">
+                    <a href="index.html">Tools</a>
+                    <a href="index.html#about">About</a>
+                </nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Contact Us</h1></div>
+
+        <div class="card">
+            <div class="card-title">Get in Touch</div>
+            <div style="line-height:1.8;">
+                <p>Thank you for using DevTools Hub!</p>
+                <p>If you have any questions, feedback, or suggestions, please feel free to contact us:</p>
+                <p><strong>Email:</strong> contact@virexstar.com</p>
+                <p>We appreciate your support and look forward to hearing from you!</p>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Terms of Service - DevTools Hub">
+    <title>Terms of Service - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span class="logo-text">DevTools Hub</span>
+            </a>
+            <div class="header-right">
+                <nav class="nav-links">
+                    <a href="index.html">Tools</a>
+                    <a href="index.html#about">About</a>
+                </nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Terms of Service</h1></div>
+
+        <div class="card">
+            <div class="card-title">Terms of Service</div>
+            <div style="line-height:1.8; white-space:pre-line;">
+<b>Last updated: May 2026</b>
+
+<b>1. Acceptance of Terms</b>
+By accessing and using DevTools Hub, you agree to be bound by these Terms of Service.
+
+<b>2. Description of Service</b>
+DevTools Hub provides free online developer tools including formatters, encoders, generators, validators, and converters. All tools are provided as-is.
+
+<b>3. User Responsibilities</b>
+You agree to use our tools only for lawful purposes and in accordance with these Terms.
+
+<b>4. Disclaimer</b>
+The tools are provided "AS IS" without warranty of any kind. We do not guarantee the accuracy or reliability of the results.
+
+<b>5. Limitation of Liability</b>
+In no event shall DevTools Hub be liable for any damages arising out of the use or inability to use our tools.
+
+<b>6. Intellectual Property</b>
+All content and materials available on DevTools Hub are property of DevTools Hub or their respective owners.
+
+<b>7. Links to Other Websites</b>
+Our website may contain links to third-party websites. We are not responsible for the content or practices of these websites.
+
+<b>8. Changes to Terms</b>
+We reserve the right to modify these Terms at any time. Continued use of the site constitutes acceptance of modified terms.
+
+<b>9. Governing Law</b>
+These Terms shall be governed by and construed in accordance with applicable laws.
+
+<b>10. Contact Information</b>
+If you have any questions about these Terms, please contact us.
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+    </script>
+</body>
+</html>
