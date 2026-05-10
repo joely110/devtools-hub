@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free online developer tools - 36 tools for coding, formatting, testing, and more. JSON, SQL, regex, hash, color, UUID, and much more. No signup required.">
-    <meta name="keywords" content="developer tools, online tools, JSON formatter, SQL formatter, regex tester, hash generator, code minifier, free tools">
-    <title>DevTools Hub - 36+ Free Developer Tools</title>
+    <meta name="description" content="Free online developer tools - 47+ tools for coding, formatting, testing, and more. JSON, SQL, YAML, regex, hash, color, UUID, QR code, and much more. No signup required.">
+    <meta name="keywords" content="developer tools, online tools, JSON formatter, SQL formatter, regex tester, hash generator, code minifier, QR generator, free tools">
+    <title>DevTools Hub - 47+ Free Developer Tools</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .search-container {
@@ -174,11 +174,11 @@
     <main>
         <section class="hero">
             <h1>Developer Tools That Just Work</h1>
-            <p>36+ free tools for developers. Format, encode, decode, generate, validate, and more. All in your browser.</p>
+            <p>47+ free tools for developers. Format, encode, decode, generate, validate, and more. All in your browser.</p>
         </section>
 
         <div class="stats-bar">
-            <div class="stat-item"><strong>36+</strong> Tools</div>
+            <div class="stat-item"><strong>47+</strong> Tools</div>
             <div class="stat-item"><strong>100%</strong> Free</div>
             <div class="stat-item"><strong>0</strong> Signup Required</div>
             <div class="stat-item"><strong>100%</strong> Private</div>
@@ -247,20 +247,35 @@
         const tools = [
             // Formatters
             { name: 'JSON Formatter', file: 'json-formatter.html', icon: '{ }', desc: 'Format, minify, and validate JSON data', category: 'formatters' },
+            { name: 'JSON Viewer', file: 'json-viewer.html', icon: '{}', desc: 'Explore JSON in tree view with expandable nodes', category: 'formatters' },
+            { name: 'JSON Diff', file: 'json-diff.html', icon: '<>', desc: 'Compare two JSON objects and find differences', category: 'formatters' },
             { name: 'SQL Formatter', file: 'sql-formatter.html', icon: 'SQL', desc: 'Format and beautify SQL queries', category: 'formatters' },
             { name: 'YAML Formatter', file: 'yaml-formatter.html', icon: 'YML', desc: 'Format, validate, convert YAML to JSON', category: 'formatters' },
             { name: 'Code Minifier', file: 'code-minifier.html', icon: '</>', desc: 'Minify HTML, CSS, and JavaScript', category: 'formatters' },
+            { name: 'JavaScript Beautifier', file: 'javascript-beautifier.html', icon: 'JS', desc: 'Format and beautify JavaScript code', category: 'formatters' },
+            { name: 'CSS Formatter', file: 'css-formatter.html', icon: '#', desc: 'Format, beautify, and minify CSS code', category: 'formatters' },
             { name: 'XML Validator', file: 'xml-validator.html', icon: '< >', desc: 'Validate and format XML documents', category: 'formatters' },
-            { name: 'JSON Validator', file: 'json-validator.html', icon: '{ }', desc: 'Validate JSON syntax and structure', category: 'validators' },
-            { name: 'YAML Validator', file: 'yaml-validator.html', icon: 'YML', desc: 'Validate YAML syntax and structure', category: 'validators' },
+            { name: 'JSON Validator', file: 'json-validator.html', icon: '{ }', desc: 'Validate JSON syntax and structure', category: 'formatters' },
+            { name: 'YAML Validator', file: 'yaml-validator.html', icon: 'YML', desc: 'Validate YAML syntax and structure', category: 'formatters' },
 
             // Encoders
             { name: 'Base64 Encoder', file: 'base64-tool.html', icon: 'B64', desc: 'Encode and decode Base64 strings', category: 'encoders' },
             { name: 'URL Encoder', file: 'url-encoder.html', icon: '%20', desc: 'Encode or decode URL strings', category: 'encoders' },
             { name: 'HTML Entity Encoder', file: 'html-entity-encoder.html', icon: '&amp;', desc: 'Encode special characters to HTML entities', category: 'encoders' },
+            { name: 'JSON String Escape', file: 'json-string-escape.html', icon: '\"', desc: 'Escape special characters for JSON strings', category: 'encoders' },
             { name: 'Unicode Escape', file: 'unicode-escape.html', icon: 'U', desc: 'Convert text to Unicode escape sequences', category: 'encoders' },
             { name: 'ROT13 Encoder', file: 'rot13-encoder.html', icon: 'R13', desc: 'Encode and decode ROT13 cipher', category: 'encoders' },
             { name: 'Text to Binary', file: 'text-to-binary.html', icon: '01', desc: 'Convert text to binary and vice versa', category: 'encoders' },
+
+            // Converters
+            { name: 'JSON ↔ YAML', file: 'json-yaml-converter.html', icon: 'Y←→J', desc: 'Convert between JSON and YAML formats', category: 'converters' },
+            { name: 'JSON ↔ XML', file: 'xml-json-converter.html', icon: 'X←→J', desc: 'Convert between JSON and XML formats', category: 'converters' },
+            { name: 'JSON to CSV', file: 'json-to-csv.html', icon: 'CSV', desc: 'Convert JSON arrays to CSV or TSV format', category: 'converters' },
+            { name: 'Color Converter', file: 'color-converter.html', icon: '🎨', desc: 'Convert HEX, RGB, HSL colors', category: 'converters' },
+            { name: 'Case Converter', file: 'case-converter.html', icon: 'Aa', desc: 'Convert text between different cases', category: 'converters' },
+            { name: 'Number Base Converter', file: 'number-base-converter.html', icon: '2/10', desc: 'Convert binary, decimal, hex, octal', category: 'converters' },
+            { name: 'Markdown to HTML', file: 'markdown-to-html.html', icon: 'MD', desc: 'Convert Markdown syntax to HTML', category: 'converters' },
+            { name: 'QR Code Generator', file: 'qr-code-generator.html', icon: 'QR', desc: 'Generate QR codes for text, URLs, WiFi', category: 'converters' },
 
             // Generators
             { name: 'Hash Generator', file: 'hash-generator.html', icon: '#', desc: 'MD5, SHA-1, SHA-256, SHA-512 hashes', category: 'generators' },
@@ -279,12 +294,6 @@
             { name: 'Email Validator', file: 'email-validator.html', icon: '@', desc: 'Validate email address format', category: 'validators' },
             { name: 'JWT Decoder', file: 'jwt-decoder.html', icon: 'JWT', desc: 'Decode and inspect JSON Web Tokens', category: 'validators' },
 
-            // Converters
-            { name: 'Color Converter', file: 'color-converter.html', icon: '🎨', desc: 'Convert HEX, RGB, HSL colors', category: 'converters' },
-            { name: 'Case Converter', file: 'case-converter.html', icon: 'Aa', desc: 'Convert text between different cases', category: 'converters' },
-            { name: 'Number Base Converter', file: 'number-base-converter.html', icon: '2/10', desc: 'Convert binary, decimal, hex, octal', category: 'converters' },
-            { name: 'Markdown to HTML', file: 'markdown-to-html.html', icon: 'MD', desc: 'Convert Markdown syntax to HTML', category: 'converters' },
-
             // Data Tools
             { name: 'Timestamp Converter', file: 'timestamp-converter.html', icon: 'Unix', desc: 'Convert Unix timestamps to dates', category: 'data' },
             { name: 'Date Calculator', file: 'date-calculator.html', icon: '📅', desc: 'Calculate days between dates', category: 'data' },
@@ -294,6 +303,7 @@
 
             // Dev Tools
             { name: 'Crontab Generator', file: 'crontab-generator.html', icon: 'cron', desc: 'Build cron schedule expressions', category: 'devtools' },
+            { name: 'Cron Explainer', file: 'cron-explainer.html', icon: 'cron', desc: 'Explain cron expressions in plain English', category: 'devtools' },
             { name: 'User Agent Parser', file: 'user-agent-parser.html', icon: 'UA', desc: 'Parse browser user agent strings', category: 'devtools' },
         ];
 

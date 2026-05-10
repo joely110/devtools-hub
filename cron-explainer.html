@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explain cron job expressions in plain English. Convert cron schedule to human-readable format.">
+    <meta name="keywords" content="cron expression, cron describer, cron job, cron schedule, cron parser">
+    <title>Cron Expression Describer - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Cron Expression Describer</h1><p>Convert cron expressions to human-readable descriptions</p></div>
+
+        <div class="card">
+            <div class="card-title">Cron Expression</div>
+            <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-top:1rem;">
+                <input type="text" id="cron-input" placeholder="* * * * *" style="flex:1;min-width:200px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;font-family:monospace;">
+                <button class="btn btn-primary" onclick="describe()">Describe</button>
+            </div>
+            <div style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted);">Format: minute hour day month weekday</div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Description</div>
+            <div id="description" style="font-size:1.1rem;padding:1rem;background:var(--success-bg);border:1px solid var(--success-border);border-radius:8px;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Common Examples</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;margin-top:1rem;">
+                <button class="preset-btn" onclick="setCron('0 * * * *')"><strong>Every hour</strong><code>0 * * * *</code></button>
+                <button class="preset-btn" onclick="setCron('0 0 * * *')"><strong>Every day at midnight</strong><code>0 0 * * *</code></button>
+                <button class="preset-btn" onclick="setCron('0 9 * * 1-5')"><strong>Weekdays at 9 AM</strong><code>0 9 * * 1-5</code></button>
+                <button class="preset-btn" onclick="setCron('*/15 * * * *')"><strong>Every 15 minutes</strong><code>*/15 * * * *</code></button>
+                <button class="preset-btn" onclick="setCron('0 0 * * 0')"><strong>Every Sunday at midnight</strong><code>0 0 * * 0</code></button>
+                <button class="preset-btn" onclick="setCron('0 0 1 * *')"><strong>First day of every month</strong><code>0 0 1 * *</code></button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function describeCron(expr) {
+            const parts = expr.trim().split(/\s+/);
+            if (parts.length !== 5) return 'Invalid cron expression (needs 5 parts)';
+
+            const [min, hour, day, month, dow] = parts;
+
+            let desc = '';
+
+            // Minute
+            if (min === '*') desc += 'Every minute';
+            else if (min.includes('/')) desc += 'Every ' + min.split('/')[1] + ' minutes';
+            else if (min.includes(',')) desc += 'At minutes ' + min;
+            else desc += 'At minute ' + min;
+
+            // Hour
+            if (hour === '*') desc += ', every hour';
+            else if (hour.includes('/')) desc += ', every ' + hour.split('/')[1] + ' hours';
+            else if (hour.includes(',')) desc += ', at hours ' + hour;
+            else desc += ', at ' + hour + ':00';
+
+            // Day of month
+            if (day !== '*') {
+                if (day.includes('/')) desc += ', every ' + day.split('/')[1] + ' days';
+                else if (day.includes(',')) desc += ', on days ' + day;
+                else desc += ', on day ' + day;
+            }
+
+            // Month
+            if (month !== '*') {
+                const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                if (month.includes(',')) desc += ', in months ' + month;
+                else desc += ', in ' + (monthNames[parseInt(month)] || 'month ' + month);
+            }
+
+            // Day of week
+            if (dow !== '*') {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                if (dow.includes(',')) desc += ', on ' + dow.split(',').map(d => dayNames[parseInt(d)] || d).join(' & ');
+                else desc += ', on ' + (dayNames[parseInt(dow)] || 'day ' + dow);
+            }
+
+            return desc;
+        }
+
+        function describe() {
+            const input = document.getElementById('cron-input').value;
+            if (!input.trim()) { alert('Please enter a cron expression.'); return; }
+            const desc = describeCron(input);
+            document.getElementById('description').textContent = desc;
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function setCron(cron) {
+            document.getElementById('cron-input').value = cron;
+            describe();
+        }
+    </script>
+</body>
+</html>

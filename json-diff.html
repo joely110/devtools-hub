@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compare two JSON files and find differences. Visual JSON diff tool for developers.">
+    <meta name="keywords" content="json diff, compare json, json compare, json difference, json compare tool">
+    <title>JSON Diff - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>JSON Diff</h1><p>Compare two JSON objects and find differences</p></div>
+
+        <div class="card">
+            <div class="card-title">Original JSON (Left)</div>
+            <textarea id="left-input" placeholder='{"name": "John", "age": 30}' style="height:200px;"></textarea>
+        </div>
+
+        <div class="card">
+            <div class="card-title">New JSON (Right)</div>
+            <textarea id="right-input" placeholder='{"name": "Jane", "age": 31}' style="height:200px;"></textarea>
+        </div>
+
+        <div class="card">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="compare()">Compare</button>
+                <button class="btn btn-secondary" onclick="swap()">Swap</button>
+                <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Differences</div>
+            <div id="diff-output" style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;white-space:pre-wrap;word-break:break-all;"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function findDiff(path, left, right, diffs = []) {
+            if (typeof left === 'object' && typeof right === 'object') {
+                if (Array.isArray(left) && Array.isArray(right)) {
+                    const maxLen = Math.max(left.length, right.length);
+                    for (let i = 0; i < maxLen; i++) {
+                        if (i >= left.length) diffs.push({ path: path + '[' + i + ']', type: 'added', value: right[i] });
+                        else if (i >= right.length) diffs.push({ path: path + '[' + i + ']', type: 'removed', value: left[i] });
+                        else findDiff(path + '[' + i + ']', left[i], right[i], diffs);
+                    }
+                } else if (!Array.isArray(left) && !Array.isArray(right)) {
+                    const allKeys = new Set([...Object.keys(left), ...Object.keys(right)]);
+                    allKeys.forEach(key => {
+                        if (!(key in left)) diffs.push({ path: path + '.' + key, type: 'added', value: right[key] });
+                        else if (!(key in right)) diffs.push({ path: path + '.' + key, type: 'removed', value: left[key] });
+                        else findDiff(path + '.' + key, left[key], right[key], diffs);
+                    });
+                }
+            } else if (left !== right) {
+                diffs.push({ path: path, type: 'changed', left: left, right: right });
+            }
+            return diffs;
+        }
+
+        function compare() {
+            try {
+                const left = JSON.parse(document.getElementById('left-input').value);
+                const right = JSON.parse(document.getElementById('right-input').value);
+                const diffs = findDiff('root', left, right);
+
+                if (diffs.length === 0) {
+                    document.getElementById('diff-output').innerHTML = '<div class="output-box success">✓ JSONs are identical</div>';
+                } else {
+                    const html = diffs.map(d => {
+                        if (d.type === 'added') return `<div style="color:var(--success);padding:0.5rem;border-bottom:1px solid var(--border);">➕ Added: ${d.path} = ${JSON.stringify(d.value)}</div>`;
+                        if (d.type === 'removed') return `<div style="color:var(--error);padding:0.5rem;border-bottom:1px solid var(--border);">➖ Removed: ${d.path} = ${JSON.stringify(d.value)}</div>`;
+                        if (d.type === 'changed') return `<div style="color:var(--warning-border);padding:0.5rem;border-bottom:1px solid var(--border);">✱ Changed: ${d.path}\n   From: ${JSON.stringify(d.left)}\n   To: ${JSON.stringify(d.right)}</div>`;
+                    }).join('');
+                    document.getElementById('diff-output').innerHTML = html;
+                }
+                document.getElementById('result-card').style.display = 'block';
+            } catch (e) {
+                alert('Invalid JSON: ' + e.message);
+            }
+        }
+
+        function swap() {
+            const left = document.getElementById('left-input').value;
+            const right = document.getElementById('right-input').value;
+            document.getElementById('left-input').value = right;
+            document.getElementById('right-input').value = left;
+        }
+
+        function clearAll() {
+            document.getElementById('left-input').value = '';
+            document.getElementById('right-input').value = '';
+            document.getElementById('result-card').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View and edit JSON in a tree structure. Explore JSON data with collapsible tree view.">
+    <meta name="keywords" content="json viewer, json tree, json editor, explore json, json navigator">
+    <title>JSON Viewer & Editor - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>JSON Viewer & Editor</h1><p>View, explore, and edit JSON in a tree structure</p></div>
+
+        <div class="card">
+            <div class="card-title">JSON Input</div>
+            <textarea id="json-input" placeholder='{"name": "John", "age": 30, "address": {"city": "NYC"}}' style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="parse()">Parse & View</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="tree-card" style="display:none;">
+            <div class="card-title">Tree View <span id="json-info" style="font-weight:normal;font-size:0.8rem;"></span></div>
+            <div id="json-tree" style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;max-height:500px;overflow:auto;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;"></div>
+        </div>
+
+        <div class="card" id="raw-card" style="display:none;">
+            <div class="card-title">Formatted JSON</div>
+            <textarea id="formatted-output" style="height:200px;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyJSON()">Copy</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        let parsedData = null;
+        let expanded = {};
+
+        function renderValue(value, path = 'root', depth = 0) {
+            const indent = '  '.repeat(depth);
+            if (value === null) return `<span style="color:var(--text-muted);">null</span>`;
+            if (typeof value === 'boolean') return `<span style="color:var(--primary);">${value}</span>`;
+            if (typeof value === 'number') return `<span style="color:var(--success);">${value}</span>`;
+            if (typeof value === 'string') return `<span style="color:var(--error);">"${value}"</span>`;
+            if (Array.isArray(value)) {
+                if (value.length === 0) return `<span style="color:var(--text-muted);">[]</span>`;
+                const id = path.replace(/\./g, '_').replace(/\[/g, '_').replace(/\]/g, '_');
+                const expanded_local = expanded[id] !== undefined ? expanded[id] : depth < 2;
+                const items = value.map((item, i) => renderValue(item, path + '[' + i + ']', depth + 1)).join(',<br>' + indent + '  ');
+                return `<span class="json-toggle" onclick="toggleExpand('${id}', this)" style="cursor:pointer;color:var(--text);">${expanded_local ? '▼' : '▶'}</span> [<br>${indent + '  '}${items}<br>${indent}]`;
+            }
+            if (typeof value === 'object') {
+                const keys = Object.keys(value);
+                if (keys.length === 0) return `<span style="color:var(--text-muted);">{}</span>`;
+                const id = path.replace(/\./g, '_');
+                const expanded_local = expanded[id] !== undefined ? expanded[id] : depth < 2;
+                const items = keys.map(key => {
+                    const comma = key !== keys[keys.length - 1] ? ',' : '';
+                    return `<span style="color:var(--text);">"${key}"</span>: ${renderValue(value[key], path + '.' + key, depth + 1)}${comma}`;
+                }).join('<br>' + indent + '  ');
+                return `<span class="json-toggle" onclick="toggleExpand('${id}', this)" style="cursor:pointer;color:var(--text);">${expanded_local ? '▼' : '▶'}</span> {<br>${indent + '  '}${items}<br>${indent}}`;
+            }
+            return String(value);
+        }
+
+        function toggleExpand(id, el) {
+            expanded[id] = expanded[id] === undefined ? false : !expanded[id];
+            parse();
+        }
+
+        function parse() {
+            const input = document.getElementById('json-input').value;
+            if (!input.trim()) { alert('Please enter JSON first.'); return; }
+            try {
+                parsedData = JSON.parse(input);
+                const info = getJsonInfo(parsedData);
+                document.getElementById('json-info').textContent = ` | ${info.keys} keys, ${info.values} values`;
+                document.getElementById('json-tree').innerHTML = renderValue(parsedData);
+                document.getElementById('formatted-output').value = JSON.stringify(parsedData, null, 2);
+                document.getElementById('tree-card').style.display = 'block';
+                document.getElementById('raw-card').style.display = 'block';
+            } catch (e) {
+                alert('Invalid JSON: ' + e.message);
+            }
+        }
+
+        function getJsonInfo(obj, keys = 0, values = 0) {
+            if (typeof obj !== 'object' || obj === null) return { keys, values: values + 1 };
+            if (Array.isArray(obj)) {
+                obj.forEach(item => ({ keys, values } = getJsonInfo(item, keys, values)));
+            } else {
+                const objKeys = Object.keys(obj);
+                keys += objKeys.length;
+                values += objKeys.length;
+                objKeys.forEach(key => ({ keys, values } = getJsonInfo(obj[key], keys, values)));
+            }
+            return { keys, values };
+        }
+
+        function clearInput() {
+            document.getElementById('json-input').value = '';
+            document.getElementById('tree-card').style.display = 'none';
+            document.getElementById('raw-card').style.display = 'none';
+            expanded = {};
+        }
+
+        function copyJSON() { navigator.clipboard.writeText(document.getElementById('formatted-output').value).then(() => alert('JSON copied!')); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert JSON to YAML and YAML to JSON. Instant bidirectional conversion.">
+    <meta name="keywords" content="json to yaml, yaml to json, yaml converter, json converter">
+    <title>JSON ↔ YAML Converter - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>JSON ↔ YAML Converter</h1><p>Convert between JSON and YAML formats</p></div>
+
+        <div class="card">
+            <div class="card-title">JSON Input</div>
+            <textarea id="json-input" placeholder='{"name": "John", "age": 30}' style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="jsonToYaml()">JSON → YAML</button>
+                <button class="btn btn-secondary" onclick="clearJson()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="yaml-result" style="display:none;">
+            <div class="card-title">YAML Output</div>
+            <textarea id="yaml-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyYaml()">Copy YAML</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">YAML Input</div>
+            <textarea id="yaml-input" placeholder="name: John&#10;age: 30" style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="yamlToJson()">YAML → JSON</button>
+                <button class="btn btn-secondary" onclick="clearYaml()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="json-result" style="display:none;">
+            <div class="card-title">JSON Output</div>
+            <textarea id="json-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyJson()">Copy JSON</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function jsonToYaml() {
+            const input = document.getElementById('json-input').value;
+            if (!input.trim()) { alert('Please enter JSON first.'); return; }
+            try {
+                const obj = JSON.parse(input);
+                const yaml = jsonToYamlRecursive(obj, 0);
+                document.getElementById('yaml-output').value = yaml;
+                document.getElementById('yaml-result').style.display = 'block';
+            } catch (e) { alert('Invalid JSON: ' + e.message); }
+        }
+
+        function jsonToYamlRecursive(obj, indent) {
+            const spaces = '  '.repeat(indent);
+            if (obj === null) return 'null';
+            if (typeof obj === 'boolean') return obj ? 'true' : 'false';
+            if (typeof obj === 'number') return String(obj);
+            if (typeof obj === 'string') {
+                if (/[^\w\s]/.test(obj) || obj.includes(':') || obj.includes('#') || obj.includes("'") || obj.includes('"') || obj.includes('\n') || obj.startsWith(' ') || obj.endsWith(' ')) {
+                    return '"' + obj.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n') + '"';
+                }
+                return obj;
+            }
+            if (Array.isArray(obj)) {
+                if (obj.length === 0) return '[]';
+                return obj.map(item => {
+                    if (typeof item === 'object' && item !== null) {
+                        const result = jsonToYamlRecursive(item, indent + 1);
+                        const lines = result.split('\n');
+                        return lines.map((line, i) => i === 0 ? '- ' + line : spaces + '  ' + line).join('\n');
+                    }
+                    return '- ' + jsonToYamlRecursive(item, indent);
+                }).join('\n');
+            }
+            if (typeof obj === 'object') {
+                const keys = Object.keys(obj);
+                if (keys.length === 0) return '{}';
+                return keys.map(key => {
+                    const val = obj[key];
+                    if (val === null || val === undefined) return key + ': null';
+                    if (typeof val === 'object') {
+                        const result = jsonToYamlRecursive(val, indent + 1);
+                        if (Array.isArray(val) && val.length === 0) return key + ': []';
+                        if (!Array.isArray(val) && Object.keys(val).length === 0) return key + ': {}';
+                        return key + ':\n' + spaces + '  ' + result.replace(/\n/g, '\n' + spaces + '  ');
+                    }
+                    return key + ': ' + jsonToYamlRecursive(val, indent);
+                }).join('\n');
+            }
+            return String(obj);
+        }
+
+        function yamlToJson() {
+            const input = document.getElementById('yaml-input').value;
+            if (!input.trim()) { alert('Please enter YAML first.'); return; }
+            try {
+                const obj = parseYAML(input);
+                document.getElementById('json-output').value = JSON.stringify(obj, null, 2);
+                document.getElementById('json-result').style.display = 'block';
+            } catch (e) { alert('Invalid YAML: ' + e.message); }
+        }
+
+        function parseYAML(yaml, indent = 0) {
+            const result = {};
+            const lines = yaml.split('\n');
+            let i = 0;
+            while (i < lines.length) {
+                const line = lines[i];
+                if (!line.trim() || line.trim().startsWith('#')) { i++; continue; }
+                const match = line.match(/^(\s*)(.+?):\s*(.*)$/);
+                if (!match) { i++; continue; }
+                const spaces = match[1].length;
+                const key = match[2];
+                let value = match[3];
+                if (spaces < indent) break;
+                if (spaces === indent) {
+                    if (value.trim()) {
+                        result[key] = parseValue(value.trim());
+                    } else {
+                        let nextSpaces = Infinity;
+                        const rest = lines.slice(i + 1);
+                        for (let j = 0; j < rest.length; j++) {
+                            const m = rest[j].match(/^(\s*)/);
+                            if (m && rest[j].trim()) { nextSpaces = m[1].length; break; }
+                        }
+                        if (nextSpaces > spaces) {
+                            const subLines = [];
+                            let depth = 0;
+                            for (let j = i + 1; j < lines.length; j++) {
+                                const lm = lines[j].match(/^(\s*)/);
+                                const ls = lm ? lm[1].length : 0;
+                                if (ls === spaces && lines[j].trim()) break;
+                                if (ls > spaces) { subLines.push(lines[j]); depth = ls; }
+                                else break;
+                            }
+                            const subYaml = subLines.join('\n');
+                            if (subYaml.trim()) {
+                                if (subYaml.includes(':') && !subYaml.match(/^\s*-\s/)) {
+                                    result[key] = parseYAML(subYaml, spaces);
+                                } else {
+                                    const items = [];
+                                    subYaml.split('\n').forEach(l => {
+                                        const im = l.trim().match(/^-\s+(.+)/);
+                                        if (im) items.push(parseValue(im[1].trim()));
+                                        else if (l.trim()) items.push(parseValue(l.trim()));
+                                    });
+                                    result[key] = items.length ? items : subYaml;
+                                }
+                            }
+                        } else {
+                            result[key] = null;
+                        }
+                    }
+                }
+                i++;
+            }
+            return result;
+        }
+
+        function parseValue(val) {
+            if (val === 'null' || val === '~') return null;
+            if (val === 'true') return true;
+            if (val === 'false') return false;
+            if (val === 'null') return null;
+            if (/^-?\d+$/.test(val)) return parseInt(val);
+            if (/^-?\d+\.\d+$/.test(val)) return parseFloat(val);
+            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+                return val.slice(1, -1).replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\');
+            }
+            return val;
+        }
+
+        function clearJson() { document.getElementById('json-input').value = ''; document.getElementById('yaml-output').value = ''; document.getElementById('yaml-result').style.display = 'none'; }
+        function clearYaml() { document.getElementById('yaml-input').value = ''; document.getElementById('json-output').value = ''; document.getElementById('json-result').style.display = 'none'; }
+        function copyYaml() { navigator.clipboard.writeText(document.getElementById('yaml-output').value).then(() => alert('Copied!')); }
+        function copyJson() { navigator.clipboard.writeText(document.getElementById('json-output').value).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>

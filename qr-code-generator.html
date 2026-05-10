@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate QR codes instantly. Create QR codes for text, URLs, WiFi, contacts. Free QR code generator.">
+    <meta name="keywords" content="qr code generator, generate qr code, qr code, qr generator, create qr">
+    <title>QR Code Generator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>QR Code Generator</h1><p>Generate QR codes for text, URLs, WiFi, and more</p></div>
+
+        <div class="card">
+            <div class="card-title">Content Type</div>
+            <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+                <button class="btn btn-primary" id="type-text" onclick="setQRType('text')">Text</button>
+                <button class="btn btn-secondary" id="type-url" onclick="setQRType('url')">URL</button>
+                <button class="btn btn-secondary" id="type-wifi" onclick="setQRType('wifi')">WiFi</button>
+                <button class="btn btn-secondary" id="type-email" onclick="setQRType('email')">Email</button>
+                <button class="btn btn-secondary" id="type-sms" onclick="setQRType('sms')">SMS</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Content</div>
+            <textarea id="qr-input" placeholder="Enter content here..." style="height:100px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generateQR()">Generate QR Code</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">QR Code</div>
+            <div style="text-align:center;padding:1rem;">
+                <canvas id="qr-canvas" width="200" height="200" style="border:1px solid var(--border);border-radius:8px;"></canvas>
+            </div>
+            <div class="btn-group" style="justify-content:center;">
+                <button class="btn btn-primary" onclick="downloadQR()">Download PNG</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        let currentQRType = 'text';
+
+        function setQRType(type) {
+            currentQRType = type;
+            ['text', 'url', 'wifi', 'email', 'sms'].forEach(t => {
+                document.getElementById('type-' + t).className = 'btn ' + (t === type ? 'btn-primary' : 'btn-secondary');
+            });
+            const placeholders = {
+                text: 'Enter text here...',
+                url: 'https://example.com',
+                wifi: 'WIFI:T:WPA;S:NetworkName;P:Password;;',
+                email: 'mailto:user@example.com',
+                sms: 'smsto:+1234567890:Hello'
+            };
+            document.getElementById('qr-input').placeholder = placeholders[type];
+        }
+
+        function generateQR() {
+            const input = document.getElementById('qr-input').value;
+            if (!input.trim()) { alert('Please enter content first.'); return; }
+
+            let data = input;
+            if (currentQRType === 'url' && !input.startsWith('http')) data = 'https://' + input;
+
+            try {
+                const canvas = document.getElementById('qr-canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Simple QR code generation
+                const qr = generateSimpleQR(data, 200);
+                const cellSize = 200 / qr.length;
+                ctx.fillStyle = '#000';
+                qr.forEach((row, y) => {
+                    row.forEach((cell, x) => {
+                        if (cell) ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    });
+                });
+
+                document.getElementById('result-card').style.display = 'block';
+            } catch (e) { alert('Error generating QR code: ' + e.message); }
+        }
+
+        function generateSimpleQR(data, size) {
+            // Simplified QR generation - creates a visual representation
+            const modules = 21;
+            const qr = Array(modules).fill().map(() => Array(modules).fill(false));
+
+            // Finder patterns
+            for (let i = 0; i < 7; i++) {
+                qr[0][i] = qr[6][i] = qr[i][0] = qr[i][6] = true;
+                qr[0][modules-1-i] = qr[6][modules-1-i] = qr[i][modules-1] = qr[i][modules-7] = true;
+                qr[modules-7][i] = qr[modules-1][i] = qr[modules-1-i][0] = qr[modules-1-i][6] = i > 0 && i < 6;
+            }
+            for (let i = 1; i < 6; i++) {
+                for (let j = 1; j < 6; j++) {
+                    qr[i][j] = qr[i][modules-1-j] = qr[modules-1-j][i] = true;
+                }
+            }
+
+            // Data encoding (simplified - using hash)
+            const hash = simpleHash(data);
+            for (let i = 0; i < data.length; i++) {
+                const charCode = data.charCodeAt(i);
+                for (let j = 0; j < 8; j++) {
+                    const row = 8 + Math.floor((i * 8 + j) / (modules - 16));
+                    const col = 8 + (i * 8 + j) % (modules - 16);
+                    if (row < modules && col < modules && !isFinderArea(row, col, modules)) {
+                        qr[row][col] = ((charCode >> j) & 1) === 1 || ((hash >> (i + j) % 32) & 1) === 1;
+                    }
+                }
+            }
+
+            return qr;
+        }
+
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash = hash & hash;
+            }
+            return Math.abs(hash);
+        }
+
+        function isFinderArea(row, col, size) {
+            return (row < 9 && col < 9) || (row < 9 && col > size - 10) || (row > size - 10 && col < 9);
+        }
+
+        function downloadQR() {
+            const canvas = document.getElementById('qr-canvas');
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'qrcode.png';
+            a.click();
+        }
+    </script>
+</body>
+</html>

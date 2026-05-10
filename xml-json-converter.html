@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert XML to JSON and JSON to XML instantly. Bidirectional conversion between XML and JSON formats.">
+    <meta name="keywords" content="xml to json, json to xml, xml converter, json converter, xml json conversion">
+    <title>XML ↔ JSON Converter - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>XML ↔ JSON Converter</h1><p>Convert between XML and JSON formats</p></div>
+
+        <div class="card">
+            <div class="card-title">XML Input</div>
+            <textarea id="xml-input" placeholder="<root><name>John</name><age>30</age></root>" style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="xmlToJson()">XML → JSON</button>
+                <button class="btn btn-secondary" onclick="clearXml()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="json-result" style="display:none;">
+            <div class="card-title">JSON Output</div>
+            <textarea id="json-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyJson()">Copy</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">JSON Input</div>
+            <textarea id="json-input" placeholder='{"root": {"name": "John", "age": 30}}' style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="jsonToXml()">JSON → XML</button>
+                <button class="btn btn-secondary" onclick="clearJson()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="xml-result" style="display:none;">
+            <div class="card-title">XML Output</div>
+            <textarea id="xml-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyXml()">Copy</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function xmlToJson() {
+            const input = document.getElementById('xml-input').value;
+            if (!input.trim()) { alert('Please enter XML first.'); return; }
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(input, 'text/xml');
+                const error = doc.querySelector('parsererror');
+                if (error) throw new Error('Invalid XML');
+                const result = xmlToJsonRecursive(doc.documentElement);
+                document.getElementById('json-output').value = JSON.stringify(result, null, 2);
+                document.getElementById('json-result').style.display = 'block';
+            } catch (e) { alert('Invalid XML: ' + e.message); }
+        }
+
+        function xmlToJsonRecursive(node) {
+            if (node.nodeType === 3) {
+                const val = node.textContent.trim();
+                return val || null;
+            }
+            if (node.nodeType === 1) {
+                const obj = {};
+                const children = Array.from(node.childNodes).filter(n => n.nodeType !== 3 || n.textContent.trim());
+                const textContent = node.textContent?.trim();
+                if (children.length === 0 || (children.length === 1 && children[0].nodeType === 3)) {
+                    return textContent || '';
+                }
+                children.forEach(child => {
+                    if (child.nodeType === 1) {
+                        const key = child.tagName;
+                        const value = xmlToJsonRecursive(child);
+                        if (obj[key]) {
+                            if (!Array.isArray(obj[key])) obj[key] = [obj[key]];
+                            obj[key].push(value);
+                        } else {
+                            obj[key] = value;
+                        }
+                    }
+                });
+                return obj;
+            }
+            return null;
+        }
+
+        function jsonToXml() {
+            const input = document.getElementById('json-input').value;
+            if (!input.trim()) { alert('Please enter JSON first.'); return; }
+            try {
+                const obj = JSON.parse(input);
+                const xml = jsonToXmlRecursive(obj, 'root');
+                document.getElementById('xml-output').value = xml;
+                document.getElementById('xml-result').style.display = 'block';
+            } catch (e) { alert('Invalid JSON: ' + e.message); }
+        }
+
+        function jsonToXmlRecursive(obj, tagName) {
+            if (obj === null) return `<${tagName}/>`;
+            if (typeof obj === 'boolean' || typeof obj === 'number') return `<${tagName}>${obj}</${tagName}>`;
+            if (typeof obj === 'string') return `<${tagName}>${obj.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</${tagName}>`;
+            if (Array.isArray(obj)) {
+                return obj.map(item => jsonToXmlRecursive(item, tagName)).join('\n');
+            }
+            if (typeof obj === 'object') {
+                const children = Object.keys(obj).map(key => jsonToXmlRecursive(obj[key], key)).join('\n');
+                return `<${tagName}>\n${children}\n</${tagName}>`;
+            }
+            return `<${tagName}/>`;
+        }
+
+        function clearXml() { document.getElementById('xml-input').value = ''; document.getElementById('json-output').value = ''; document.getElementById('json-result').style.display = 'none'; }
+        function clearJson() { document.getElementById('json-input').value = ''; document.getElementById('xml-output').value = ''; document.getElementById('xml-result').style.display = 'none'; }
+        function copyJson() { navigator.clipboard.writeText(document.getElementById('json-output').value).then(() => alert('Copied!')); }
+        function copyXml() { navigator.clipboard.writeText(document.getElementById('xml-output').value).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>
