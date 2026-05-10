@@ -6,7 +6,7 @@
     <meta name="description" content="Convert Markdown to HTML instantly. Preview formatted output. Free Markdown to HTML converter.">
     <meta name="keywords" content="markdown to html, md to html, markdown converter, markdown preview">
     <title>Markdown to HTML - DevTools Hub</title>
-    < link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
@@ -56,18 +56,45 @@
 
         function mdToHtml(md) {
             let html = md
+                .replace(/```[\s\S]*?```/g, match => '<pre>' + match.replace(/```\n?/, '').replace(/```$/, '') + '</pre>')
+                .replace(/`(.+?)`/g, '<code>$1</code>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
                 .replace(/^### (.+)$/gm, '<h3>$1</h3>')
                 .replace(/^## (.+)$/gm, '<h2>$1</h2>')
                 .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.+?)\*/g, '<em>$1</em>')
-                .replace(/`(.+?)`/g, '<code>$1</code>')
+                .replace(/^>\s*(.+)$/gm, '<blockquote>$1</blockquote>')
+                .replace(/^---$/gm, '<hr>')
                 .replace(/^\- (.+)$/gm, '<li>$1</li>')
-                .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-                .replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>');
-            return '<p>' + html + '</p>';
+                .replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+
+            // Wrap consecutive <li> elements in <ul>
+            html = html.replace(/(<li>.*<\/li>)(\n<li>.*<\/li>)*/g, match => {
+                const lines = match.split('\n');
+                let inList = false;
+                let result = '';
+                for (const line of lines) {
+                    if (line.startsWith('<li>')) {
+                        if (!inList) { result += '<ul>\n'; inList = true; }
+                        result += line + '\n';
+                    } else {
+                        if (inList) { result += '</ul>\n'; inList = false; }
+                        result += line + '\n';
+                    }
+                }
+                if (inList) result += '</ul>';
+                return result;
+            });
+
+            // Paragraphs
+            html = html.split('\n\n').map(p => {
+                if (p.startsWith('<h') || p.startsWith('<ul') || p.startsWith('<blockquote') || p.startsWith('<pre') || p.startsWith('<hr')) return p;
+                return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+            }).join('\n');
+
+            return html;
         }
 
         function convert() {
