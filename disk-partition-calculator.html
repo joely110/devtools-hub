@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate disk partition sizes for optimal integerGB. Compute drive partition calculations.">
+    <meta name="keywords" content="disk partition calculator, partition size, hard drive partition, integer partition">
+    <title>Disk Partition Calculator - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Disk Partition Calculator</h1><p>Calculate optimal hard drive partition sizes</p></div>
+
+        <div class="card">
+            <div class="card-title">Drive Size (GB)</div>
+            <div style="display:flex;gap:1rem;align-items:center;margin-top:1rem;flex-wrap:wrap;">
+                <input type="number" id="drive-size" value="500" min="1" style="width:150px;padding:0.75rem;border:1px solid var(--border);border-radius:8px;">
+                <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Results</div>
+            <div style="display:grid;gap:0.75rem;margin-top:1rem;">
+                <div class="result-item"><label>Listed Size (shown by Windows)</label><code id="listed-size" style="font-size:1.1rem;"></code></div>
+                <div class="result-item"><label>Actual Size (real bytes)</label><code id="actual-size" style="font-size:1.1rem;"></code></div>
+                <div class="result-item"><label>Lost Space</label><code id="lost-space" style="font-size:1.1rem;"></code></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Partition Size Reference Table</div>
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+                    <thead>
+                        <tr style="border-bottom:2px solid var(--border);">
+                            <th style="text-align:left;padding:0.5rem;">Actual (GB)</th>
+                            <th style="text-align:left;padding:0.5rem;">Shows As (GB)</th>
+                            <th style="text-align:left;padding:0.5rem;">Shows As (GiB)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function calculate() {
+            const sizeGB = parseFloat(document.getElementById('drive-size').value);
+            if (!sizeGB || sizeGB < 1) { alert('Please enter a valid size.'); return; }
+
+            const actualBytes = sizeGB * 1000 * 1000 * 1000;
+            const listedSizeGB = Math.floor(actualBytes / (1024 * 1024 * 1024));
+            const lostBytes = actualBytes - (listedSizeGB * 1024 * 1024 * 1024);
+
+            document.getElementById('listed-size').textContent = listedSizeGB + ' GB';
+            document.getElementById('actual-size').textContent = formatBytes(actualBytes);
+            document.getElementById('lost-space').textContent = formatBytes(lostBytes) + ' (' + ((lostBytes / actualBytes) * 100).toFixed(2) + '%)';
+
+            // Build table
+            const tbody = document.getElementById('table-body');
+            const rows = [];
+            for (let i = 1; i <= 1000; i *= 10) {
+                rows.push(i, i + i/2, i + i/4, i + i*3/4);
+            }
+            rows.sort((a, b) => a - b);
+            const uniqueRows = [...new Set(rows.filter(r => r <= 10000))].sort((a, b) => a - b).slice(0, 20);
+
+            tbody.innerHTML = uniqueRows.map(gb => {
+                const bytes = gb * 1000 * 1000 * 1000;
+                const shownGB = Math.floor(bytes / (1024 * 1024 * 1024));
+                const shownGiB = (bytes / (1024 * 1024 * 1024)).toFixed(2);
+                return `<tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem;">${gb}</td>
+                    <td style="padding:0.5rem;">${shownGB} GB</td>
+                    <td style="padding:0.5rem;">${shownGiB} GiB</td>
+                </tr>`;
+            }).join('');
+
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes >= 1e12) return (bytes / 1e12).toFixed(2) + ' TB';
+            if (bytes >= 1e9) return (bytes / 1e9).toFixed(2) + ' GB';
+            if (bytes >= 1e6) return (bytes / 1e6).toFixed(2) + ' MB';
+            return bytes + ' bytes';
+        }
+
+        // Load table on page load
+        calculate();
+    </script>
+</body>
+</html>

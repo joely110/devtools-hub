@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert Java properties files to YAML format. Instant conversion with validation.">
+    <meta name="keywords" content="properties to yaml, java properties converter, properties yaml converter">
+    <title>Properties to YAML - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Properties to YAML</h1><p>Convert Java properties files to YAML format</p></div>
+
+        <div class="card">
+            <div class="card-title">Properties Input</div>
+            <textarea id="props-input" placeholder="app.name=MyApp&#10;app.version=1.0&#10;app.description=Example application" style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="convert()">Convert to YAML</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">YAML Output</div>
+            <textarea id="yaml-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyOutput()">Copy</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function convert() {
+            const input = document.getElementById('props-input').value;
+            if (!input.trim()) { alert('Please enter properties first.'); return; }
+
+            const lines = input.split('\n');
+            const result = {};
+            const stack = [{ obj: result, prefix: '' }];
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line || line.startsWith('#') || line.startsWith('!')) return;
+
+                const eqIndex = line.indexOf('=');
+                const colonIndex = line.indexOf(':');
+                const sepIndex = eqIndex !== -1 && colonIndex !== -1 ? Math.min(eqIndex, colonIndex) : (eqIndex !== -1 ? eqIndex : colonIndex);
+
+                if (sepIndex === -1) return;
+
+                const key = line.substring(0, sepIndex).trim();
+                let value = line.substring(sepIndex + 1).trim();
+
+                // Remove quotes
+                if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+                    value = value.slice(1, -1);
+                }
+
+                // Handle nested keys with dots
+                const keyParts = key.split('.');
+                let current = result;
+
+                for (let i = 0; i < keyParts.length; i++) {
+                    const part = keyParts[i];
+                    const isLast = i === keyParts.length - 1;
+
+                    if (isLast) {
+                        current[part] = value;
+                    } else {
+                        if (!current[part] || typeof current[part] !== 'object') {
+                            current[part] = {};
+                        }
+                        current = current[part];
+                    }
+                }
+            });
+
+            const yaml = objToYaml(result, 0);
+            document.getElementById('yaml-output').value = yaml;
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function objToYaml(obj, indent) {
+            const spaces = '  '.repeat(indent);
+            const lines = [];
+
+            if (Array.isArray(obj)) {
+                obj.forEach(item => {
+                    if (typeof item === 'object' && item !== null) {
+                        lines.push(objToYaml(item, indent));
+                    } else {
+                        lines.push(`${spaces}- ${item}`);
+                    }
+                });
+            } else if (typeof obj === 'object' && obj !== null) {
+                Object.keys(obj).forEach(key => {
+                    const val = obj[key];
+                    if (val === null || val === undefined) {
+                        lines.push(`${spaces}${key}: null`);
+                    } else if (typeof val === 'object') {
+                        lines.push(`${spaces}${key}:`);
+                        lines.push(objToYaml(val, indent + 1));
+                    } else {
+                        const valStr = typeof val === 'string' && (val.includes(':') || val.includes('#') || val.includes("'") || val.includes('"') || val.includes('\n') || val.startsWith(' ') || val.endsWith(' ')) ? `"${val.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"` : val;
+                        lines.push(`${spaces}${key}: ${valStr}`);
+                    }
+                });
+            }
+
+            return lines.join('\n');
+        }
+
+        function clearInput() { document.getElementById('props-input').value = ''; document.getElementById('yaml-output').value = ''; document.getElementById('result-card').style.display = 'none'; }
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('yaml-output').value).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>

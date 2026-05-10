@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compare two texts and find differences. Word-level diff comparison tool.">
+    <meta name="keywords" content="text diff, compare text, text difference, word diff, text compare">
+    <title>Text Diff - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>Text Diff</h1><p>Compare two texts and find differences word by word</p></div>
+
+        <div class="card">
+            <div class="card-title">Original Text (Left)</div>
+            <textarea id="left-input" placeholder="Enter original text..." style="height:150px;"></textarea>
+        </div>
+
+        <div class="card">
+            <div class="card-title">New Text (Right)</div>
+            <textarea id="right-input" placeholder="Enter new text..." style="height:150px;"></textarea>
+        </div>
+
+        <div class="card">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="compare()">Compare</button>
+                <button class="btn btn-secondary" onclick="swap()">Swap</button>
+                <button class="btn btn-secondary" onclick="clearAll()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="result-card" style="display:none;">
+            <div class="card-title">Differences</div>
+            <div id="diff-output" style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;white-space:pre-wrap;padding:1rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;max-height:400px;overflow:auto;"></div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function diffWords(oldStr, newStr) {
+            const oldWords = oldStr.split(/(\s+)/);
+            const newWords = newStr.split(/(\s+)/);
+            const result = [];
+
+            let oldIdx = 0, newIdx = 0;
+            while (oldIdx < oldWords.length || newIdx < newWords.length) {
+                if (oldIdx >= oldWords.length) {
+                    result.push({ type: 'added', text: newWords.slice(newIdx).join('') });
+                    break;
+                }
+                if (newIdx >= newWords.length) {
+                    result.push({ type: 'removed', text: oldWords.slice(oldIdx).join('') });
+                    break;
+                }
+
+                if (oldWords[oldIdx] === newWords[newIdx]) {
+                    result.push({ type: 'unchanged', text: oldWords[oldIdx] });
+                    oldIdx++;
+                    newIdx++;
+                } else {
+                    // Try to find next match
+                    let found = false;
+                    for (let i = 1; i <= Math.max(oldWords.length - oldIdx, newWords.length - newIdx); i++) {
+                        if (newIdx + i < newWords.length && oldWords[oldIdx] === newWords[newIdx + i]) {
+                            result.push({ type: 'added', text: newWords.slice(newIdx, newIdx + i).join('') });
+                            newIdx += i;
+                            found = true;
+                            break;
+                        }
+                        if (oldIdx + i < oldWords.length && oldWords[oldIdx + i] === newWords[newIdx]) {
+                            result.push({ type: 'removed', text: oldWords.slice(oldIdx, oldIdx + i).join('') });
+                            oldIdx += i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        result.push({ type: 'removed', text: oldWords[oldIdx] });
+                        result.push({ type: 'added', text: newWords[newIdx] });
+                        oldIdx++;
+                        newIdx++;
+                    }
+                }
+            }
+            return result;
+        }
+
+        function compare() {
+            const left = document.getElementById('left-input').value;
+            const right = document.getElementById('right-input').value;
+            if (!left.trim() || !right.trim()) { alert('Please enter both texts.'); return; }
+
+            const diff = diffWords(left, right);
+            let html = '';
+            diff.forEach(d => {
+                if (d.type === 'added') html += `<span style="background:var(--success-bg);color:var(--success);">${escapeHtml(d.text)}</span>`;
+                else if (d.type === 'removed') html += `<span style="background:var(--error-bg);color:var(--error);text-decoration:line-through;">${escapeHtml(d.text)}</span>`;
+                else html += escapeHtml(d.text);
+            });
+
+            document.getElementById('diff-output').innerHTML = html;
+            document.getElementById('result-card').style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function swap() {
+            const left = document.getElementById('left-input').value;
+            const right = document.getElementById('right-input').value;
+            document.getElementById('left-input').value = right;
+            document.getElementById('right-input').value = left;
+        }
+
+        function clearAll() {
+            document.getElementById('left-input').value = '';
+            document.getElementById('right-input').value = '';
+            document.getElementById('result-card').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

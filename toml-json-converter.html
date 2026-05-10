@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert TOML to JSON and JSON to TOML. Bidirectional TOML converter with validation.">
+    <meta name="keywords" content="toml to json, json to toml, toml converter, toml json converter">
+    <title>TOML ↔ JSON Converter - DevTools Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo"><div class="logo-icon">{ }</div><span class="logo-text">DevTools Hub</span></a>
+            <div class="header-right">
+                <nav class="nav-links"><a href="index.html">Tools</a><a href="index.html#about">About</a></nav>
+                <div class="theme-switcher">
+                    <button class="theme-btn" data-theme="light" title="Light" onclick="setTheme('light')">☀</button>
+                    <button class="theme-btn" data-theme="dark" title="Dark" onclick="setTheme('dark')">🌙</button>
+                    <button class="theme-btn" data-theme="sepia" title="Sepia" onclick="setTheme('sepia')">📜</button>
+                    <button class="theme-btn" data-theme="contrast" title="High Contrast" onclick="setTheme('contrast')">◐</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <a href="index.html" class="back-link">← Back to all tools</a>
+        <div class="tool-header"><h1>TOML ↔ JSON Converter</h1><p>Convert between TOML and JSON formats</p></div>
+
+        <div class="card">
+            <div class="card-title">TOML Input</div>
+            <textarea id="toml-input" placeholder="[section]&#10;name = &quot;John&quot;&#10;age = 30" style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="tomlToJson()">TOML → JSON</button>
+                <button class="btn btn-secondary" onclick="clearToml()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="toml-result" style="display:none;">
+            <div class="card-title">JSON Output</div>
+            <textarea id="json-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyJson()">Copy</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">JSON Input</div>
+            <textarea id="json-input" placeholder='{"section": {"name": "John", "age": 30}}' style="height:200px;"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="jsonToToml()">JSON → TOML</button>
+                <button class="btn btn-secondary" onclick="clearJson()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card" id="json-result" style="display:none;">
+            <div class="card-title">TOML Output</div>
+            <textarea id="toml-output" style="height:200px;font-family:'SF Mono',Monaco,monospace;font-size:0.85rem;" readonly></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyToml()">Copy</button>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 DevTools Hub. All tools are free to use.</p></footer>
+    <script>
+        function setTheme(theme) { document.body.setAttribute('data-theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-theme') === theme)); localStorage.setItem('theme', theme); }
+        setTheme(localStorage.getItem('theme') || 'light');
+
+        function parseToml(toml) {
+            const result = {};
+            const lines = toml.split('\n');
+            let currentSection = result;
+            let currentSectionName = '';
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line || line.startsWith('#')) return;
+
+                // Section header
+                const sectionMatch = line.match(/^\[(.+)\]$/);
+                if (sectionMatch) {
+                    currentSectionName = sectionMatch[1];
+                    currentSection = {};
+                    result[currentSectionName] = currentSection;
+                    return;
+                }
+
+                // Key-value pair
+                const eqIndex = line.indexOf('=');
+                if (eqIndex === -1) return;
+
+                const key = line.substring(0, eqIndex).trim();
+                let value = line.substring(eqIndex + 1).trim();
+
+                // Parse value
+                if (value === 'true') value = true;
+                else if (value === 'false') value = false;
+                else if (value === 'null') value = null;
+                else if (/^\d+$/.test(value)) value = parseInt(value);
+                else if (/^\d+\.\d+$/.test(value)) value = parseFloat(value);
+                else if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+                    value = value.slice(1, -1);
+                }
+
+                currentSection[key] = value;
+            });
+
+            return result;
+        }
+
+        function toToml(obj, prefix = '') {
+            let toml = '';
+            const keys = Object.keys(obj);
+
+            keys.forEach(key => {
+                const val = obj[key];
+                const fullKey = prefix ? prefix + '.' + key : key;
+
+                if (val === null || val === undefined) return;
+
+                if (typeof val === 'object' && !Array.isArray(val)) {
+                    toml += `[${fullKey}]\n`;
+                    toml += toToml(val, fullKey);
+                } else {
+                    if (typeof val === 'string') {
+                        toml += `${key} = "${val.replace(/"/g, '\\"')}"\n`;
+                    } else if (typeof val === 'boolean') {
+                        toml += `${key} = ${val}\n`;
+                    } else if (typeof val === 'number') {
+                        toml += `${key} = ${val}\n`;
+                    }
+                }
+            });
+
+            return toml;
+        }
+
+        function tomlToJson() {
+            const input = document.getElementById('toml-input').value;
+            if (!input.trim()) { alert('Please enter TOML first.'); return; }
+            try {
+                const obj = parseToml(input);
+                document.getElementById('json-output').value = JSON.stringify(obj, null, 2);
+                document.getElementById('toml-result').style.display = 'block';
+            } catch (e) { alert('Invalid TOML: ' + e.message); }
+        }
+
+        function jsonToToml() {
+            const input = document.getElementById('json-input').value;
+            if (!input.trim()) { alert('Please enter JSON first.'); return; }
+            try {
+                const obj = JSON.parse(input);
+                document.getElementById('toml-output').value = toToml(obj);
+                document.getElementById('json-result').style.display = 'block';
+            } catch (e) { alert('Invalid JSON: ' + e.message); }
+        }
+
+        function clearToml() { document.getElementById('toml-input').value = ''; document.getElementById('json-output').value = ''; document.getElementById('toml-result').style.display = 'none'; }
+        function clearJson() { document.getElementById('json-input').value = ''; document.getElementById('toml-output').value = ''; document.getElementById('json-result').style.display = 'none'; }
+        function copyJson() { navigator.clipboard.writeText(document.getElementById('json-output').value).then(() => alert('Copied!')); }
+        function copyToml() { navigator.clipboard.writeText(document.getElementById('toml-output').value).then(() => alert('Copied!')); }
+    </script>
+</body>
+</html>
